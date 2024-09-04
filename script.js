@@ -1,19 +1,18 @@
 const mic = document.getElementById('mic');
 const instrument = document.getElementById('instrument');
 const audio = document.getElementById('audio');
+const toggleButton = document.createElement('button'); // Create the toggle button
+
+// Set initial button text
+toggleButton.innerText = 'Start Audio';
+document.body.appendChild(toggleButton); // Add the button to the body
 
 let audioContext;
 let source;
 let panner;
 let bassEQ;
 
-// Create the toggle button (initial state: Start Audio)
-const toggleButton = document.createElement('button');
-toggleButton.innerText = 'Start Audio';
-document.body.appendChild(toggleButton);
-
 toggleButton.addEventListener('click', () => {
-    // If audio is not playing, start it
     if (!audioContext || audioContext.state === 'suspended') {
         if (!audioContext) {
             // Initialize AudioContext and connect the audio element once
@@ -83,8 +82,8 @@ function updateAudio(x, y, width, height) {
     }
 
     if (bassEQ) {
-        // Make the EQ effect more noticeable by increasing the gain range
-        const eqValue = -30 + (y / height) * 60;  // Adjust the bass EQ from -30dB to +30dB
+        // Fine-tune EQ to prevent extreme distortion (-10dB to +10dB)
+        const eqValue = -10 + (y / height) * 20;  // Adjust the bass EQ from -10dB to +10dB
         bassEQ.gain.setValueAtTime(eqValue, audioContext.currentTime);
     }
 }
