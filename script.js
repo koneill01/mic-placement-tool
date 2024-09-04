@@ -2,6 +2,7 @@ const mic = document.getElementById('mic');
 const instrument = document.getElementById('instrument');
 const audio = document.getElementById('audio');
 const toggleButton = document.createElement('button'); // Create the toggle button
+const holeMarker = document.getElementById('holeMarker'); // Hole marker
 
 // Set initial button text
 toggleButton.innerText = 'Start Audio';
@@ -13,8 +14,12 @@ let panner;
 let bassEQ;
 
 // Define the position of the hole on the drum
-const holeX = 250;  // Adjust this value to match the actual position of the hole
-const holeY = 300;  // Adjust this value to match the actual position of the hole
+let holeX = 250;  // Adjust this value to match the actual position of the hole
+let holeY = 300;  // Adjust this value to match the actual position of the hole
+
+// Position the hole marker visually based on holeX and holeY
+holeMarker.style.left = `${holeX - 10}px`;  // Center the marker horizontally
+holeMarker.style.top = `${holeY - 10}px`;   // Center the marker vertically
 
 toggleButton.addEventListener('click', () => {
     if (!audioContext || audioContext.state === 'suspended') {

@@ -6,32 +6,30 @@ body {
     padding: 20px;
 }
 
-h1 {
-    color: #333;
-}
-
-p {
-    color: #666;
-}
-
 .instrument {
     position: relative;
-    width: 600px;
-    height: 400px;
+    width: 600px;  /* Adjust to your image's size */
+    height: 600px;  /* Adjust to your image's size */
     background-image: url('assets/drum.jpg'); /* Replace with your instrument image */
-    background-size: contain;  /* Ensures the image is fully visible */
-    background-repeat: no-repeat;
-    background-position: center; /* Center the image */
+    background-size: cover;
     border: 2px solid #ccc;
     margin: 20px auto;
 }
 
-
 .mic {
     position: absolute;
-    width: 80px;  /* Increase size */
-    height: 80px; /* Increase size */
+    width: 50px;
+    height: 50px;
     background-image: url('assets/mic-icon.png'); /* Replace with your microphone icon */
     background-size: cover;
     cursor: grab;
+}
+
+.hole-marker {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    border-radius: 50%;  /* Makes it a circle */
+    pointer-events: none;  /* Prevents it from being draggable */
 }
