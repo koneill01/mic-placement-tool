@@ -33,10 +33,10 @@ toggleButton.addEventListener('click', () => {
         audio.play();
         audioContext.resume();  // Ensure the AudioContext is active
 
-        // Change button to Stop Audio
+        // Change button text to "Stop Audio" without removing it
         toggleButton.innerText = 'Stop Audio';
     } else {
-        // Stop the audio and reset the button to Start Audio
+        // Stop the audio and reset the button to "Start Audio"
         audio.pause();
         audio.currentTime = 0;  // Reset to the beginning
         audioContext.suspend();  // Suspend the AudioContext to stop audio processing
@@ -82,8 +82,5 @@ function updateAudio(x, y, width, height) {
     }
 
     if (bassEQ) {
-        // Fine-tune EQ to prevent extreme distortion (-10dB to +10dB)
-        const eqValue = -10 + (y / height) * 20;  // Adjust the bass EQ from -10dB to +10dB
-        bassEQ.gain.setValueAtTime(eqValue, audioContext.currentTime);
-    }
-}
+        // Fine-tune EQ to prevent extreme distortion (-5dB to +5dB)
+        const eqValue = -5 + (y / height) * 10;  // Adjust the bass EQ
