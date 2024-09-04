@@ -18,8 +18,8 @@ body {
 
 .mic {
     position: absolute;
-    width: 120px;
-    height: 120px;
+    width: 150px;
+    height: 150px;
     background-image: url('assets/mic-icon.png'); /* Replace with your microphone icon */
     background-size: cover;
     cursor: grab;
