@@ -14,7 +14,7 @@ let panner;
 let bassEQ;
 
 // Define the position of the hole on the drum
-let holeX = 335;  // Increase this to move the marker to the right
+let holeX = 360;  // Increase this to move the marker to the right
 let holeY = 400;  // Increase this to move the marker down
 
 // Position the hole marker visually based on holeX and holeY
