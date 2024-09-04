@@ -83,4 +83,7 @@ function updateAudio(x, y, width, height) {
 
     if (bassEQ) {
         // Fine-tune EQ to prevent extreme distortion (-5dB to +5dB)
-        const eqValue = -5 + (y / height) * 10;  // Adjust the bass EQ
+        const eqValue = -5 + (y / height) * 10;  // Adjust the bass EQ from -5dB to +5dB
+        bassEQ.gain.setValueAtTime(eqValue, audioContext.currentTime);
+    }
+}
