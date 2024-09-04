@@ -14,12 +14,13 @@ let panner;
 let bassEQ;
 
 // Define the position of the hole on the drum
-let holeX = 250;  // Adjust this value to match the actual position of the hole
-let holeY = 300;  // Adjust this value to match the actual position of the hole
+let holeX = 320;  // Increase this to move the marker to the right
+let holeY = 400;  // Increase this to move the marker down
 
 // Position the hole marker visually based on holeX and holeY
 holeMarker.style.left = `${holeX - 10}px`;  // Center the marker horizontally
 holeMarker.style.top = `${holeY - 10}px`;   // Center the marker vertically
+
 
 toggleButton.addEventListener('click', () => {
     if (!audioContext || audioContext.state === 'suspended') {
