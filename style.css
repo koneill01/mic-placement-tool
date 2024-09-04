@@ -24,14 +24,14 @@ body {
     background-size: cover;
     cursor: grab;
 }
-
+/*  
 .hole-marker {
     position: absolute;
     width: 20px;
     height: 20px;
     background-color: red;
-    border-radius: 50%;  /* Makes it a circle */
-    pointer-events: none;  /* Prevents it from being draggable */
-    z-index: 10;  /* Ensures the marker is on top */
+    border-radius: 50%;  
+    pointer-events: none;  
+    z-index: 10; 
 }
-
+*/
