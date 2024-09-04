@@ -7,14 +7,16 @@ let source;
 let panner;
 let bassEQ;
 
-window.onload = () => {
-    const playButton = document.createElement('button');
-    playButton.innerText = 'Start Audio';
-    document.body.appendChild(playButton);
+// Create the toggle button (initial state: Start Audio)
+const toggleButton = document.createElement('button');
+toggleButton.innerText = 'Start Audio';
+document.body.appendChild(toggleButton);
 
-    playButton.addEventListener('click', () => {
-        // Initialize AudioContext and connect the audio element once
+toggleButton.addEventListener('click', () => {
+    // If audio is not playing, start it
+    if (!audioContext || audioContext.state === 'suspended') {
         if (!audioContext) {
+            // Initialize AudioContext and connect the audio element once
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             source = audioContext.createMediaElementSource(audio);
 
@@ -30,9 +32,19 @@ window.onload = () => {
         }
 
         audio.play();
-        playButton.remove(); // Remove button after audio starts
-    });
-};
+        audioContext.resume();  // Ensure the AudioContext is active
+
+        // Change button to Stop Audio
+        toggleButton.innerText = 'Stop Audio';
+    } else {
+        // Stop the audio and reset the button to Start Audio
+        audio.pause();
+        audio.currentTime = 0;  // Reset to the beginning
+        audioContext.suspend();  // Suspend the AudioContext to stop audio processing
+
+        toggleButton.innerText = 'Start Audio';
+    }
+});
 
 let dragging = false;
 
@@ -71,14 +83,8 @@ function updateAudio(x, y, width, height) {
     }
 
     if (bassEQ) {
-        const eqValue = 40 + (y / height) * 60;  // Adjust the bass EQ from 40Hz to 100Hz
+        // Make the EQ effect more noticeable by increasing the gain range
+        const eqValue = -30 + (y / height) * 60;  // Adjust the bass EQ from -30dB to +30dB
         bassEQ.gain.setValueAtTime(eqValue, audioContext.currentTime);
     }
 }
-
-// Stop audio functionality
-const stopButton = document.getElementById('stopAudio');
-stopButton.addEventListener('click', () => {
-    audio.pause();  // Stop the audio
-    audio.currentTime = 0;  // Reset to the beginning
-});
