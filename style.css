@@ -32,4 +32,6 @@ body {
     background-color: red;
     border-radius: 50%;  /* Makes it a circle */
     pointer-events: none;  /* Prevents it from being draggable */
+    z-index: 10;  /* Ensures the marker is on top */
 }
+
