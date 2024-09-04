@@ -12,6 +12,10 @@ let source;
 let panner;
 let bassEQ;
 
+// Define the position of the hole on the drum
+const holeX = 250;  // Adjust this value to match the actual position of the hole
+const holeY = 300;  // Adjust this value to match the actual position of the hole
+
 toggleButton.addEventListener('click', () => {
     if (!audioContext || audioContext.state === 'suspended') {
         if (!audioContext) {
@@ -66,7 +70,7 @@ document.addEventListener('mousemove', (e) => {
         mic.style.top = `${y}px`;
 
         // Update audio based on mic position
-        updateAudio(x, y, rect.width, rect.height);
+        updateAudio(x, y);
     }
 });
 
@@ -75,15 +79,25 @@ document.addEventListener('mouseup', () => {
     mic.style.cursor = 'grab';
 });
 
-function updateAudio(x, y, width, height) {
+// Function to calculate the distance between two points
+function calculateDistance(x1, y1, x2, y2) {
+    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+}
+
+function updateAudio(micX, micY) {
     if (panner) {
-        const panValue = (x / width) * 2 - 1;  // Convert x position to range [-1, 1]
+        const panValue = (micX / instrument.offsetWidth) * 2 - 1;  // Convert x position to range [-1, 1]
         panner.pan.value = panValue;  // Adjust panning based on mic position
     }
 
     if (bassEQ) {
-        // Fine-tune EQ to prevent extreme distortion (-5dB to +5dB)
-        const eqValue = -5 + (y / height) * 10;  // Adjust the bass EQ from -5dB to +5dB
-        bassEQ.gain.setValueAtTime(eqValue, audioContext.currentTime);
+        // Calculate the distance between the mic and the hole
+        const distance = calculateDistance(micX, micY, holeX, holeY);
+
+        // Adjust the bass based on the distance from the hole
+        const maxDistance = 300;  // Define a maximum distance where the effect becomes minimal
+        const bassBoost = Math.max(0, (maxDistance - distance) / maxDistance) * 10;  // Maximum boost is 10dB
+
+        bassEQ.gain.setValueAtTime(bassBoost, audioContext.currentTime);
     }
 }
