@@ -1,109 +1,80 @@
-const mic = document.getElementById('mic');
-const instrument = document.getElementById('instrument');
-const audio = document.getElementById('audio');
-const toggleButton = document.createElement('button'); // Create the toggle button
-/* const holeMarker = document.getElementById('holeMarker'); // Hole marker */
+// Initialize scene, camera, and renderer
+let scene = new THREE.Scene();
+let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+let renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.getElementById('container').appendChild(renderer.domElement);
 
-// Set initial button text
-toggleButton.innerText = 'Start Audio';
-document.body.appendChild(toggleButton); // Add the button to the body
+// Add lighting
+const light = new THREE.PointLight(0xffffff, 1, 100);
+light.position.set(10, 10, 10);
+scene.add(light);
 
-let audioContext;
-let source;
-let panner;
-let bassEQ;
+// Create a placeholder object (later replace with a drum kit model)
+const geometry = new THREE.BoxGeometry(1, 1, 1);
+const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const cube = new THREE.Mesh(geometry, material);
+scene.add(cube);
 
-// Define the position of the hole on the drum
-let holeX = 390;  // Increase this to move the marker to the right
-let holeY = 400;  // Increase this to move the marker down
+// Set camera position
+camera.position.z = 5;
 
-// Position the hole marker visually based on holeX and holeY
-/* holeMarker.style.left = `${holeX - 10}px`;  // Center the marker horizontally
-holeMarker.style.top = `${holeY - 10}px`;   // Center the marker vertically
- */
+// Render loop
+function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+}
+animate();
 
-toggleButton.addEventListener('click', () => {
-    if (!audioContext || audioContext.state === 'suspended') {
-        if (!audioContext) {
-            // Initialize AudioContext and connect the audio element once
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            source = audioContext.createMediaElementSource(audio);
+let raycaster = new THREE.Raycaster();
+let mouse = new THREE.Vector2();
+let draggable = null;
 
-            // Create bass EQ filter
-            bassEQ = audioContext.createBiquadFilter();
-            bassEQ.type = 'lowshelf';  // Boost or cut low frequencies
-            bassEQ.frequency.setValueAtTime(100, audioContext.currentTime); // 100Hz
+// Create a draggable microphone object (replace with your mic model later)
+const micGeometry = new THREE.SphereGeometry(0.2, 32, 32);
+const micMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+const microphone = new THREE.Mesh(micGeometry, micMaterial);
+microphone.position.set(0, 0, 0);
+scene.add(microphone);
 
-            panner = audioContext.createStereoPanner();
+// Listen for mouse down
+window.addEventListener('mousedown', onMouseDown, false);
 
-            // Connect audio source -> bassEQ -> panner -> destination
-            source.connect(bassEQ).connect(panner).connect(audioContext.destination);
+// Mouse down event handler
+function onMouseDown(event) {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    let intersects = raycaster.intersectObjects(scene.children);
+    
+    if (intersects.length > 0) {
+        draggable = intersects[0].object;
+        window.addEventListener('mousemove', onMouseMove, false);
+        window.addEventListener('mouseup', onMouseUp, false);
+    }
+}
+
+// Mouse move event handler
+function onMouseMove(event) {
+    if (draggable) {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        let intersects = raycaster.intersectObjects(scene.children);
+        
+        if (intersects.length > 0) {
+            let point = intersects[0].point;
+            draggable.position.copy(point);
         }
-
-        audio.play();
-        audioContext.resume();  // Ensure the AudioContext is active
-
-        // Change button text to "Stop Audio" without removing it
-        toggleButton.innerText = 'Stop Audio';
-    } else {
-        // Stop the audio and reset the button to "Start Audio"
-        audio.pause();
-        audio.currentTime = 0;  // Reset to the beginning
-        audioContext.suspend();  // Suspend the AudioContext to stop audio processing
-
-        toggleButton.innerText = 'Start Audio';
-    }
-});
-
-let dragging = false;
-
-mic.addEventListener('mousedown', (e) => {
-    dragging = true;
-    mic.style.cursor = 'grabbing';
-});
-
-document.addEventListener('mousemove', (e) => {
-    if (dragging) {
-        const rect = instrument.getBoundingClientRect();
-        let x = e.clientX - rect.left - (mic.offsetWidth / 2);
-        let y = e.clientY - rect.top - (mic.offsetHeight / 2);
-
-        // Boundaries to prevent mic from going out of instrument
-        x = Math.max(0, Math.min(x, rect.width - mic.offsetWidth));
-        y = Math.max(0, Math.min(y, rect.height - mic.offsetHeight));
-
-        mic.style.left = `${x}px`;
-        mic.style.top = `${y}px`;
-
-        // Update audio based on mic position
-        updateAudio(x, y);
-    }
-});
-
-document.addEventListener('mouseup', () => {
-    dragging = false;
-    mic.style.cursor = 'grab';
-});
-
-// Function to calculate the distance between two points
-function calculateDistance(x1, y1, x2, y2) {
-    return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-}
-
-function updateAudio(micX, micY) {
-    if (panner) {
-        const panValue = (micX / instrument.offsetWidth) * 2 - 1;  // Convert x position to range [-1, 1]
-        panner.pan.value = panValue;  // Adjust panning based on mic position
-    }
-
-    if (bassEQ) {
-        // Calculate the distance between the mic and the hole
-        const distance = calculateDistance(micX, micY, holeX, holeY);
-
-        // Adjust the bass based on the distance from the hole
-        const maxDistance = 300;  // Define a maximum distance where the effect becomes minimal
-        const bassBoost = Math.max(0, (maxDistance - distance) / maxDistance) * 10;  // Maximum boost is 10dB
-
-        bassEQ.gain.setValueAtTime(bassBoost, audioContext.currentTime);
     }
 }
+
+// Mouse up event handler
+function onMouseUp() {
+    draggable = null;
+    window.removeEventListener('mousemove', onMouseMove, false);
+    window.removeEventListener('mouseup', onMouseUp, false);
+}
+

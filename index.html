@@ -7,21 +7,12 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <h1>Virtual Mic Placement Tool</h1>
+    
+    <!-- Canvas for rendering Three.js 3D scene -->
+    <div id="container"></div>
 
-    <h1>Mic Placement Tool</h1>
-    <p>Drag the mic around to hear how the sound changes based on its position.</p>
-
-    <!-- Main interactive area with the instrument background -->
-    <div class="instrument" id="instrument">
-        <!-- Microphone icon to drag -->
-        <div class="mic" id="mic"></div>
-        <!-- Visual marker for the bass boost hole -->
-        <!-- <div class="hole-marker" id="holeMarker"></div> -->
-    </div>
-
-    <!-- Audio element (can be hidden later) -->
-    <audio id="audio" src="assets/audio-file.mp3" loop></audio> <!-- Replace with your actual audio file -->
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
