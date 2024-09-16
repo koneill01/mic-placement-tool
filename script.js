@@ -20,7 +20,7 @@ const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 const cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 
-// Create a larger draggable microphone object
+// Create a draggable microphone object
 const micGeometry = new THREE.SphereGeometry(1, 32, 32); // Larger sphere for the mic
 const micMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red color for visibility
 const microphone = new THREE.Mesh(micGeometry, micMaterial);
@@ -29,6 +29,64 @@ scene.add(microphone);
 
 // Set camera position
 camera.position.set(0, 0, 15); // Move camera further back
+
+// Create an invisible plane for mic movement (x-y plane, fixed at z=0)
+const planeGeometry = new THREE.PlaneGeometry(100, 100); // Large plane
+const planeMaterial = new THREE.MeshBasicMaterial({ visible: false }); // Invisible
+const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+plane.position.set(0, 0, 0); // Fixed at z=0
+scene.add(plane);
+
+// Raycaster and draggable object (Microphone simulation)
+let raycaster = new THREE.Raycaster();
+let mouse = new THREE.Vector2();
+let draggable = null;
+
+// Listen for mouse down
+window.addEventListener('mousedown', onMouseDown, false);
+
+function onMouseDown(event) {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    
+    // Check if we're clicking the microphone first
+    let intersects = raycaster.intersectObjects([microphone]);
+
+    if (intersects.length > 0) {
+        console.log("Object clicked: ", intersects[0].object);
+        draggable = intersects[0].object;
+        window.addEventListener('mousemove', onMouseMove, false);
+        window.addEventListener('mouseup', onMouseUp, false);
+    } else {
+        console.log("No objects intersected.");
+    }
+}
+
+function onMouseMove(event) {
+    if (draggable) {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        
+        // Intersect the plane instead of free space
+        let intersects = raycaster.intersectObject(plane);
+
+        if (intersects.length > 0) {
+            let point = intersects[0].point; // Constrain the mic to this plane
+            console.log("Dragging to point: ", point);
+            draggable.position.set(point.x, point.y, draggable.position.z); // Only update x and y
+        }
+    }
+}
+
+function onMouseUp() {
+    draggable = null;
+    window.removeEventListener('mousemove', onMouseMove, false);
+    window.removeEventListener('mouseup', onMouseUp, false);
+}
 
 // Render loop
 function animate() {
@@ -44,53 +102,4 @@ function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-}
-
-// Remove WEBGL check since it's causing issues
-
-// Raycaster and draggable object (Microphone simulation)
-let raycaster = new THREE.Raycaster();
-let mouse = new THREE.Vector2();
-let draggable = null;
-
-// Listen for mouse down
-window.addEventListener('mousedown', onMouseDown, false);
-
-function onMouseDown(event) {
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-    raycaster.setFromCamera(mouse, camera);
-    let intersects = raycaster.intersectObjects(scene.children);
-
-    if (intersects.length > 0) {
-        console.log("Object clicked: ", intersects[0].object); // Log clicked object
-        draggable = intersects[0].object;
-        window.addEventListener('mousemove', onMouseMove, false);
-        window.addEventListener('mouseup', onMouseUp, false);
-    } else {
-        console.log("No objects intersected.");
-    }
-}
-
-function onMouseMove(event) {
-    if (draggable) {
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-        raycaster.setFromCamera(mouse, camera);
-        let intersects = raycaster.intersectObjects(scene.children);
-
-        if (intersects.length > 0) {
-            let point = intersects[0].point;
-            console.log("Dragging to point: ", point); // Log dragging coordinates
-            draggable.position.copy(point);
-        }
-    }
-}
-
-function onMouseUp() {
-    draggable = null;
-    window.removeEventListener('mousemove', onMouseMove, false);
-    window.removeEventListener('mouseup', onMouseUp, false);
 }
