@@ -18,8 +18,8 @@ const loader = new THREE.GLTFLoader();
 
 loader.load('assets/drumkit.glb', function(gltf) {
     const model = gltf.scene;
-    model.scale.set(5, 5, 5); // Scale up the drum kit model to make it bigger
-    model.position.set(0, 0, 0); // Center the drumkit
+    model.scale.set(5, 5, 5); // Keep the scale large
+    model.position.set(0, -2, 0); // Adjust y-axis to center it vertically
     scene.add(model);
 }, undefined, function(error) {
     console.error('An error occurred while loading the model:', error);
