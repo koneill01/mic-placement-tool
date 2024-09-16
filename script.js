@@ -21,7 +21,7 @@ const cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 
 // Create a larger draggable microphone object
-const micGeometry = new THREE.SphereGeometry(0.5, 32, 32); // Larger sphere for the mic
+const micGeometry = new THREE.SphereGeometry(1, 32, 32); // Larger sphere for the mic
 const micMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red color for visibility
 const microphone = new THREE.Mesh(micGeometry, micMaterial);
 microphone.position.set(2, 0, 0); // Place it slightly to the side of the cube
@@ -67,10 +67,14 @@ function onMouseDown(event) {
     raycaster.setFromCamera(mouse, camera);
     let intersects = raycaster.intersectObjects(scene.children);
 
+    // Log which object is being clicked
     if (intersects.length > 0) {
-        draggable = intersects[0].object;
+        console.log("Intersected Object: ", intersects[0].object);
+        draggable = intersects[0].object; // Assign the clicked object to draggable
         window.addEventListener('mousemove', onMouseMove, false);
         window.addEventListener('mouseup', onMouseUp, false);
+    } else {
+        console.log("No object intersected.");
     }
 }
 
@@ -85,6 +89,7 @@ function onMouseMove(event) {
         if (intersects.length > 0) {
             let point = intersects[0].point;
             draggable.position.copy(point);
+            console.log("Dragging to: ", point); // Log dragging process
         }
     }
 }
