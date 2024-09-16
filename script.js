@@ -16,8 +16,8 @@ const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 const cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 
-// Set camera position
-camera.position.set(0, 0, 10); // Move camera further back
+// Adjust camera to move back a little further
+camera.position.set(0, 0, 15); // Move the camera further back for better view
 
 // Render loop
 function animate() {
@@ -46,10 +46,11 @@ let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 let draggable = null;
 
-const micGeometry = new THREE.SphereGeometry(0.2, 32, 32);
-const micMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+// Create a larger draggable microphone object
+const micGeometry = new THREE.SphereGeometry(0.5, 32, 32); // Larger sphere (0.5 radius)
+const micMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red color for visibility
 const microphone = new THREE.Mesh(micGeometry, micMaterial);
-microphone.position.set(0, 0, 0);
+microphone.position.set(2, 0, 0); // Place it slightly to the side of the cube
 scene.add(microphone);
 
 // Listen for mouse down
