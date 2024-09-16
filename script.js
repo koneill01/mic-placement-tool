@@ -14,21 +14,27 @@ scene.add(light);
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Softer ambient light
 scene.add(ambientLight);
 
-// Create a placeholder object (later replace with a drum kit model)
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+// Load GLTFLoader
+const loader = new THREE.GLTFLoader();
+
+// Load the drumkit model from the assets folder
+loader.load('assets/drumkit.glb', function(gltf) {
+    const model = gltf.scene;
+    model.position.set(0, 0, 0); // Center the drumkit model
+    scene.add(model);
+}, undefined, function(error) {
+    console.error('An error occurred while loading the model:', error);
+});
+
+// Set camera position
+camera.position.set(0, 0, 15); // Move camera further back
 
 // Create a draggable microphone object
 const micGeometry = new THREE.SphereGeometry(1, 32, 32); // Larger sphere for the mic
 const micMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red color for visibility
 const microphone = new THREE.Mesh(micGeometry, micMaterial);
-microphone.position.set(2, 0, 0); // Place it slightly to the side of the cube
+microphone.position.set(2, 0, 0); // Place it slightly to the side of the drumkit
 scene.add(microphone);
-
-// Set camera position
-camera.position.set(0, 0, 15); // Move camera further back
 
 // Create an invisible plane for mic movement (x-y plane, fixed at z=0)
 const planeGeometry = new THREE.PlaneGeometry(100, 100); // Large plane
