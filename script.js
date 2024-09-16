@@ -10,14 +10,25 @@ const light = new THREE.PointLight(0xffffff, 1, 100);
 light.position.set(10, 10, 10);
 scene.add(light);
 
+// Ambient lighting to ensure all objects are visible
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Softer ambient light
+scene.add(ambientLight);
+
 // Create a placeholder object (later replace with a drum kit model)
 const geometry = new THREE.BoxGeometry(1, 1, 1);
 const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 const cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 
-// Adjust camera to move back a little further
-camera.position.set(0, 0, 15); // Move the camera further back for better view
+// Create a larger draggable microphone object
+const micGeometry = new THREE.SphereGeometry(0.5, 32, 32); // Larger sphere for the mic
+const micMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red color for visibility
+const microphone = new THREE.Mesh(micGeometry, micMaterial);
+microphone.position.set(2, 0, 0); // Place it slightly to the side of the cube
+scene.add(microphone);
+
+// Set camera position
+camera.position.set(0, 0, 15); // Move camera further back
 
 // Render loop
 function animate() {
@@ -45,13 +56,6 @@ if (!WEBGL.isWebGLAvailable()) {
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 let draggable = null;
-
-// Create a larger draggable microphone object
-const micGeometry = new THREE.SphereGeometry(0.5, 32, 32); // Larger sphere (0.5 radius)
-const micMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red color for visibility
-const microphone = new THREE.Mesh(micGeometry, micMaterial);
-microphone.position.set(2, 0, 0); // Place it slightly to the side of the cube
-scene.add(microphone);
 
 // Listen for mouse down
 window.addEventListener('mousedown', onMouseDown, false);
