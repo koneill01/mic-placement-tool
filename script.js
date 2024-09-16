@@ -46,11 +46,7 @@ function onWindowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-// Check WebGL availability
-if (!WEBGL.isWebGLAvailable()) {
-    const warning = WEBGL.getWebGLErrorMessage();
-    document.getElementById('container').appendChild(warning);
-}
+// Remove WEBGL check since it's causing issues
 
 // Raycaster and draggable object (Microphone simulation)
 let raycaster = new THREE.Raycaster();
@@ -67,14 +63,13 @@ function onMouseDown(event) {
     raycaster.setFromCamera(mouse, camera);
     let intersects = raycaster.intersectObjects(scene.children);
 
-    // Log which object is being clicked
     if (intersects.length > 0) {
-        console.log("Intersected Object: ", intersects[0].object);
-        draggable = intersects[0].object; // Assign the clicked object to draggable
+        console.log("Object clicked: ", intersects[0].object); // Log clicked object
+        draggable = intersects[0].object;
         window.addEventListener('mousemove', onMouseMove, false);
         window.addEventListener('mouseup', onMouseUp, false);
     } else {
-        console.log("No object intersected.");
+        console.log("No objects intersected.");
     }
 }
 
@@ -88,8 +83,8 @@ function onMouseMove(event) {
 
         if (intersects.length > 0) {
             let point = intersects[0].point;
+            console.log("Dragging to point: ", point); // Log dragging coordinates
             draggable.position.copy(point);
-            console.log("Dragging to: ", point); // Log dragging process
         }
     }
 }
