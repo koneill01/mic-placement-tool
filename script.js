@@ -5,22 +5,21 @@ let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById('container').appendChild(renderer.domElement);
 
-// Add lighting
-const light = new THREE.PointLight(0xffffff, 1, 100);
+// Add lighting (increase intensity and add more ambient light)
+const light = new THREE.PointLight(0xffffff, 2, 100); // Increase intensity
 light.position.set(10, 10, 10);
 scene.add(light);
 
-// Ambient lighting to ensure all objects are visible
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Softer ambient light
+const ambientLight = new THREE.AmbientLight(0xffffff, 1); // Increase ambient light
 scene.add(ambientLight);
 
-// Load GLTFLoader
+// Load GLTFLoader and the drumkit model
 const loader = new THREE.GLTFLoader();
 
-// Load the drumkit model from the assets folder
 loader.load('assets/drumkit.glb', function(gltf) {
     const model = gltf.scene;
-    model.position.set(0, 0, 0); // Center the drumkit model
+    model.scale.set(5, 5, 5); // Scale up the drum kit model to make it bigger
+    model.position.set(0, 0, 0); // Center the drumkit
     scene.add(model);
 }, undefined, function(error) {
     console.error('An error occurred while loading the model:', error);
@@ -33,7 +32,7 @@ camera.position.set(0, 0, 15); // Move camera further back
 const micGeometry = new THREE.SphereGeometry(1, 32, 32); // Larger sphere for the mic
 const micMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Red color for visibility
 const microphone = new THREE.Mesh(micGeometry, micMaterial);
-microphone.position.set(2, 0, 0); // Place it slightly to the side of the drumkit
+microphone.position.set(5, 0, 0); // Place it slightly to the side of the drumkit
 scene.add(microphone);
 
 // Create an invisible plane for mic movement (x-y plane, fixed at z=0)
