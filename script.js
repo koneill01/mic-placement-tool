@@ -23,12 +23,14 @@ scene.add(ambientLight);
 const loadingBar = document.createElement('div');
 loadingBar.id = 'loadingBar';
 loadingBar.style.position = 'absolute';
-loadingBar.style.width = '100%';
-loadingBar.style.height = '5px';
+loadingBar.style.width = '300px';
+loadingBar.style.height = '10px';
 loadingBar.style.backgroundColor = '#fff';
 loadingBar.style.top = '50%';
-loadingBar.style.left = '0';
-loadingBar.style.transform = 'translateY(-50%)';
+loadingBar.style.left = '50%';
+loadingBar.style.transform = 'translate(-50%, -50%)';
+loadingBar.style.borderRadius = '5px';
+loadingBar.style.boxShadow = '0px 0px 10px rgba(0,0,0,0.5)';
 document.body.appendChild(loadingBar);
 
 let drumKit, micModel;
@@ -44,9 +46,9 @@ loader.load('assets/drumkit.glb', function (gltf) {
     loader.load('assets/d112_microphone.glb', function (gltfMic) {
         micModel = gltfMic.scene;
         micModel.scale.set(0.02, 0.02, 0.02); // Slightly smaller microphone
-        micModel.position.set(0, -0.9, 1.5); // Closer and higher to the drum kit
+        micModel.position.set(0, -0.5, 1.3); // Closer and higher to the drum kit
 
-        micModel.rotation.set(0, Math.PI / 2, 0); // Rotate microphone towards the drum kit
+        micModel.rotation.set(0, -Math.PI / 2, 0); // Rotate microphone 180 degrees to face drum kit
 
         drumKit.add(micModel); // Attach microphone to drum kit for rotation
 
@@ -138,6 +140,14 @@ function stopRotation() {
 
 document.getElementById('moveCenter').addEventListener('click', () => {
     drumKit.rotation.y = 0; // Center/Reset the drum kit rotation
+});
+
+// Add zoom buttons
+document.getElementById('zoomIn').addEventListener('click', () => {
+    camera.position.z -= 1; // Zoom in
+});
+document.getElementById('zoomOut').addEventListener('click', () => {
+    camera.position.z += 1; // Zoom out
 });
 
 // Fix for audio playback (start/stop audio)
