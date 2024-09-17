@@ -5,6 +5,9 @@ let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById('container').appendChild(renderer.domElement);
 
+// Adjust the camera position to fit the drum kit better
+camera.position.set(0, 5, 30); // Move the camera further back
+
 // Add lighting
 const light = new THREE.PointLight(0xffffff, 2, 100);
 light.position.set(10, 10, 10);
@@ -19,7 +22,7 @@ let drumKit;
 
 loader.load('assets/drumkit.glb', function(gltf) {
     drumKit = gltf.scene;
-    drumKit.scale.set(3, 3, 3); // Scale down the drum kit to make it smaller
+    drumKit.scale.set(2, 2, 2); // Scale down the drum kit further
     drumKit.position.set(0, -2, 0); // Center it
     scene.add(drumKit);
 }, undefined, function(error) {
@@ -27,7 +30,7 @@ loader.load('assets/drumkit.glb', function(gltf) {
 });
 
 // Create a draggable microphone object
-const micGeometry = new THREE.SphereGeometry(1, 32, 32);
+const micGeometry = new THREE.SphereGeometry(0.5, 32, 32); // Scale down the microphone
 const micMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
 const microphone = new THREE.Mesh(micGeometry, micMaterial);
 microphone.position.set(5, 0, 0);
@@ -84,7 +87,7 @@ function onMouseUp() {
     window.removeEventListener('mouseup', onMouseUp, false);
 }
 
-// Handle drum kit movement with buttons
+// Add buttons to move the drum kit to preset positions
 document.getElementById('moveLeft').addEventListener('click', () => {
     if (drumKit) drumKit.position.x -= 2; // Move left
 });
@@ -111,10 +114,19 @@ document.getElementById('startAudio').addEventListener('click', () => {
         track.connect(gainNode).connect(audioContext.destination);
         audioElement.loop = true;
         audioElement.play(); // Start playing the audio
-        console.log("Audio started");
+        document.getElementById('startAudio').style.display = 'none'; // Hide the button
+        document.getElementById('stopAudio').style.display = 'inline'; // Show stop button
     }
     audioContext.resume(); // Ensure audio starts after interaction
-    document.getElementById('startAudio').style.display = 'none'; // Hide the button after starting
+});
+
+// Add Stop Audio button functionality
+document.getElementById('stopAudio').addEventListener('click', () => {
+    if (audioElement) {
+        audioElement.pause(); // Stop the audio
+        document.getElementById('stopAudio').style.display = 'none'; // Hide the stop button
+        document.getElementById('startAudio').style.display = 'inline'; // Show start button again
+    }
 });
 
 // Render loop
