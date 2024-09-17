@@ -5,6 +5,9 @@ let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById('container').appendChild(renderer.domElement);
 
+// Set a new background color for better contrast
+scene.background = new THREE.Color(0x404040); // Light gray background for contrast
+
 // Adjust the camera position
 camera.position.set(0, 5, 20); // Move the camera further back to fit the drum kit
 
@@ -29,8 +32,8 @@ loader.load('assets/drumkit.glb', function(gltf) {
     // Load the microphone model after the drum kit
     loader.load('assets/d112_microphone.glb', function(gltfMic) {
         micModel = gltfMic.scene;
-        micModel.scale.set(0.1, 0.1, 0.1); // Scale the microphone down significantly
-        micModel.position.set(5, 0, 0); // Position it near the drum kit
+        micModel.scale.set(0.02, 0.02, 0.02); // Make the microphone much smaller
+        micModel.position.set(0, -1.5, 2); // Position it close to the kick drum
         drumKit.add(micModel); // Attach the microphone to the drum kit to rotate with it
     }, undefined, function(error) {
         console.error('Error loading microphone:', error);
