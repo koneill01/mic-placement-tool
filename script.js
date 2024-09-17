@@ -19,8 +19,8 @@ let drumKit;
 
 loader.load('assets/drumkit.glb', function(gltf) {
     drumKit = gltf.scene;
-    drumKit.scale.set(5, 5, 5);
-    drumKit.position.set(0, -2, 0); // Start centered
+    drumKit.scale.set(3, 3, 3); // Scale down the drum kit to make it smaller
+    drumKit.position.set(0, -2, 0); // Center it
     scene.add(drumKit);
 }, undefined, function(error) {
     console.error('An error occurred while loading the model:', error);
@@ -84,7 +84,7 @@ function onMouseUp() {
     window.removeEventListener('mouseup', onMouseUp, false);
 }
 
-// Add buttons to move the drum kit to preset positions
+// Handle drum kit movement with buttons
 document.getElementById('moveLeft').addEventListener('click', () => {
     if (drumKit) drumKit.position.x -= 2; // Move left
 });
@@ -97,19 +97,24 @@ document.getElementById('moveCenter').addEventListener('click', () => {
     if (drumKit) drumKit.position.x = 0; // Center drum kit
 });
 
-// Fix for audio playback (add a button to start audio after user interaction)
-let audioContext = new (window.AudioContext || window.webkitAudioContext)();
-let audioElement = new Audio('assets/drum-loop.mp3'); // Replace with your audio file
-let track = audioContext.createMediaElementSource(audioElement);
-let gainNode = audioContext.createGain();
-track.connect(gainNode).connect(audioContext.destination);
-audioElement.loop = true;
+// Fix for audio playback (only start after user clicks the button)
+let audioContext;
+let audioElement;
+let gainNode;
 
 document.getElementById('startAudio').addEventListener('click', () => {
-    audioContext.resume().then(() => {
-        audioElement.play(); // Play audio after interaction
-        document.getElementById('startAudio').style.display = 'none'; // Hide the button after starting
-    });
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        audioElement = new Audio('assets/drum-loop.mp3'); // Replace with your audio file
+        let track = audioContext.createMediaElementSource(audioElement);
+        gainNode = audioContext.createGain();
+        track.connect(gainNode).connect(audioContext.destination);
+        audioElement.loop = true;
+        audioElement.play(); // Start playing the audio
+        console.log("Audio started");
+    }
+    audioContext.resume(); // Ensure audio starts after interaction
+    document.getElementById('startAudio').style.display = 'none'; // Hide the button after starting
 });
 
 // Render loop
