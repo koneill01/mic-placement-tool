@@ -29,6 +29,8 @@ loader.load('assets/drumkit.glb', function(gltf) {
     drumKit.position.set(0, -2, 0); // Center the drum kit
     scene.add(drumKit);
 
+    console.log('Drumkit loaded successfully');
+
     // Load the microphone model after the drum kit
     loader.load('assets/d112_microphone.glb', function(gltfMic) {
         micModel = gltfMic.scene;
@@ -39,6 +41,7 @@ loader.load('assets/drumkit.glb', function(gltf) {
         micModel.rotation.set(0, Math.PI / 2, 0); // Rotate to face the drum kit
 
         scene.add(micModel); // Add microphone to the scene (independently, not attached to drumKit)
+        console.log('Microphone loaded successfully');
     }, undefined, function(error) {
         console.error('Error loading microphone:', error);
     });
