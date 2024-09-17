@@ -3,7 +3,7 @@ let scene = new THREE.Scene();
 scene.background = new THREE.Color(0x555555); // Setting the background color
 
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(0, 1.5, 8); // Adjusted camera position for a more zoomed-out initial view
+camera.position.set(0, 2, 12); // Zoom out further to prevent overly large objects
 
 let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -40,15 +40,15 @@ loadingManager.onLoad = function () {
 let loader = new THREE.GLTFLoader(loadingManager);
 loader.load('assets/drumkit.glb', function (gltf) {
     let drumKit = gltf.scene;
-    drumKit.scale.set(0.5, 0.5, 0.5); // Scaling drum kit to a manageable size
+    drumKit.scale.set(0.3, 0.3, 0.3); // Further scale down the drum kit
     drumKit.position.set(0, -1, 0); // Position drum kit on the ground
     scene.add(drumKit);
 
     // Load Microphone Model
     loader.load('assets/d112_microphone.glb', function (micGltf) {
         let microphone = micGltf.scene;
-        microphone.scale.set(0.3, 0.3, 0.3); // Adjusting the mic to fit with the drum kit scale
-        microphone.position.set(0.5, 0, 1.5); // Position the mic in front of the drum kit
+        microphone.scale.set(0.15, 0.15, 0.15); // Further reduce mic size
+        microphone.position.set(0.5, 0.5, 2); // Position the mic in front and slightly higher
         scene.add(microphone);
 
         // Make mic rotate with drumkit
@@ -74,7 +74,7 @@ loader.load('assets/drumkit.glb', function (gltf) {
             clearInterval(interval);
         };
 
-        let zoomSpeed = 0.05;
+        let zoomSpeed = 0.1;
         document.getElementById('zoomIn').onmousedown = function () {
             zoomIn();
             interval = setInterval(zoomIn, 100);
