@@ -40,7 +40,7 @@ loadingManager.onLoad = function () {
 let loader = new THREE.GLTFLoader(loadingManager);
 loader.load('assets/drumkit.glb', function (gltf) {
     let drumKit = gltf.scene;
-    drumKit.scale.set(4, 4, 4); // Scaling drum kit to be larger
+    drumKit.scale.set(6, 6, 6); // Scaling drum kit to be larger
     drumKit.position.set(0, -2.5, 0); // Adjusting position to sit on the ground
     scene.add(drumKit);
 
