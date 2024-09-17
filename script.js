@@ -20,18 +20,25 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
 
 // Loading bar
+const loadingContainer = document.createElement('div');
+loadingContainer.id = 'loadingContainer';
+loadingContainer.style.position = 'absolute';
+loadingContainer.style.width = '300px';
+loadingContainer.style.height = '20px';
+loadingContainer.style.backgroundColor = '#fff';
+loadingContainer.style.top = '50%';
+loadingContainer.style.left = '50%';
+loadingContainer.style.transform = 'translate(-50%, -50%)';
+loadingContainer.style.borderRadius = '5px';
+loadingContainer.style.boxShadow = '0px 0px 10px rgba(0,0,0,0.5)';
+document.body.appendChild(loadingContainer);
+
 const loadingBar = document.createElement('div');
 loadingBar.id = 'loadingBar';
-loadingBar.style.position = 'absolute';
-loadingBar.style.width = '300px';
-loadingBar.style.height = '10px';
-loadingBar.style.backgroundColor = '#fff';
-loadingBar.style.top = '50%';
-loadingBar.style.left = '50%';
-loadingBar.style.transform = 'translate(-50%, -50%)';
-loadingBar.style.borderRadius = '5px';
-loadingBar.style.boxShadow = '0px 0px 10px rgba(0,0,0,0.5)';
-document.body.appendChild(loadingBar);
+loadingBar.style.width = '0';
+loadingBar.style.height = '100%';
+loadingBar.style.backgroundColor = '#007bff';
+loadingContainer.appendChild(loadingBar);
 
 let drumKit, micModel;
 
@@ -48,18 +55,23 @@ loader.load('assets/drumkit.glb', function (gltf) {
         micModel.scale.set(0.02, 0.02, 0.02); // Slightly smaller microphone
         micModel.position.set(0, -0.5, 1.3); // Closer and higher to the drum kit
 
-        micModel.rotation.set(0, -Math.PI / 2, 0); // Rotate microphone 180 degrees to face drum kit
+        micModel.rotation.set(0, Math.PI / 2, 0); // Rotate microphone to face drum kit
 
         drumKit.add(micModel); // Attach microphone to drum kit for rotation
 
         // Remove loading bar once both models are loaded
-        document.body.removeChild(loadingBar);
+        document.body.removeChild(loadingContainer);
         console.log('Microphone loaded successfully');
     }, undefined, function (error) {
         console.error('Error loading microphone:', error);
     });
 
-}, undefined, function (error) {
+}, function (xhr) {
+    // Update loading bar progress
+    const percentComplete = xhr.loaded / xhr.total * 100;
+    loadingBar.style.width = `${percentComplete}%`;
+    console.log(percentComplete + '% loaded');
+}, function (error) {
     console.error('An error occurred while loading the drum kit:', error);
 });
 

@@ -12,7 +12,7 @@
     <!-- Canvas for rendering Three.js 3D scene -->
     <div id="container"></div>
 
-    <!-- Buttons to control the drum kit -->
+    <!-- Controls for drum kit rotation and zoom -->
     <div id="controls">
         <button id="moveLeft">Rotate Left</button>
         <button id="moveRight">Rotate Right</button>
@@ -23,15 +23,20 @@
 
     <!-- Button to start and stop audio -->
     <button id="startAudio">Start Audio</button>
-    <button id="stopAudio" style="display:none;">Stop Audio</button>
+    <button id="stopAudio" style="display: none;">Stop Audio</button>
 
-    <!-- Three.js library -->
+    <!-- Loading Container for progress -->
+    <div id="loadingContainer" style="display: none;">
+        <div id="loadingBar"></div>
+    </div>
+
+    <!-- Import Three.js library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-    <!-- GLTFLoader to load the drumkit model -->
+    <!-- Import GLTFLoader for 3D model loading -->
     <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/loaders/GLTFLoader.js"></script>
 
-    <!-- Link to your JavaScript file -->
+    <!-- Link to the custom JavaScript file -->
     <script src="script.js"></script>
 </body>
 </html>
