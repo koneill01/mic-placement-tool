@@ -12,13 +12,23 @@
     <!-- Canvas for rendering Three.js 3D scene -->
     <div id="container"></div>
 
+    <!-- Buttons to move the drum kit -->
+    <div id="controls">
+        <button id="moveLeft">Move Left</button>
+        <button id="moveRight">Move Right</button>
+        <button id="moveCenter">Center</button>
+    </div>
+
+    <!-- Button to start audio -->
+    <button id="startAudio">Start Audio</button>
+
     <!-- Three.js library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <!-- GLTFLoader to load the drumkit model -->
     <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/loaders/GLTFLoader.js"></script>
 
-    <!-- OrbitControls for moving the camera around -->
+    <!-- OrbitControls for moving the camera around (if needed later) -->
     <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/controls/OrbitControls.js"></script>
 
     <!-- Link to your JavaScript file -->

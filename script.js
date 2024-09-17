@@ -1,14 +1,9 @@
-// Initialize scene, camera, renderer, and controls
+// Initialize scene, camera, renderer
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById('container').appendChild(renderer.domElement);
-
-// Add controls for moving the drum kit around
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
-camera.position.set(0, 5, 20); // Adjust camera position
-controls.update();
 
 // Add lighting
 const light = new THREE.PointLight(0xffffff, 2, 100);
@@ -20,13 +15,12 @@ scene.add(ambientLight);
 
 // Load GLTFLoader and the drumkit model
 const loader = new THREE.GLTFLoader();
-
-let drumKit; // Variable to store the drumkit model
+let drumKit;
 
 loader.load('assets/drumkit.glb', function(gltf) {
     drumKit = gltf.scene;
     drumKit.scale.set(5, 5, 5);
-    drumKit.position.set(0, -2, 0);
+    drumKit.position.set(0, -2, 0); // Start centered
     scene.add(drumKit);
 }, undefined, function(error) {
     console.error('An error occurred while loading the model:', error);
@@ -51,16 +45,7 @@ let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 let draggable = null;
 
-// Load and play an audio file using the Web Audio API
-let audioContext = new (window.AudioContext || window.webkitAudioContext)();
-let audioElement = new Audio('assets/drum-loop.mp3'); // Add your audio file here
-let track = audioContext.createMediaElementSource(audioElement);
-let gainNode = audioContext.createGain(); // Control volume
-track.connect(gainNode).connect(audioContext.destination);
-audioElement.loop = true; // Loop the sound
-audioElement.play(); // Start playing the audio
-
-// Listen for mouse down to start dragging the microphone
+// Listen for mouse down to drag the microphone
 window.addEventListener('mousedown', onMouseDown, false);
 
 function onMouseDown(event) {
@@ -89,14 +74,6 @@ function onMouseMove(event) {
         if (intersects.length > 0) {
             let point = intersects[0].point;
             draggable.position.set(point.x, point.y, draggable.position.z);
-
-            // Calculate distance from the microphone to the drum kit and adjust volume
-            if (drumKit) {
-                let distance = microphone.position.distanceTo(drumKit.position);
-                let volume = Math.max(0.1, 1 - distance / 20); // Adjust volume based on distance
-                gainNode.gain.value = volume;
-                console.log("Distance: ", distance, "Volume: ", volume);
-            }
         }
     }
 }
@@ -107,10 +84,37 @@ function onMouseUp() {
     window.removeEventListener('mouseup', onMouseUp, false);
 }
 
+// Add buttons to move the drum kit to preset positions
+document.getElementById('moveLeft').addEventListener('click', () => {
+    if (drumKit) drumKit.position.x -= 2; // Move left
+});
+
+document.getElementById('moveRight').addEventListener('click', () => {
+    if (drumKit) drumKit.position.x += 2; // Move right
+});
+
+document.getElementById('moveCenter').addEventListener('click', () => {
+    if (drumKit) drumKit.position.x = 0; // Center drum kit
+});
+
+// Fix for audio playback (add a button to start audio after user interaction)
+let audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let audioElement = new Audio('assets/drum-loop.mp3'); // Replace with your audio file
+let track = audioContext.createMediaElementSource(audioElement);
+let gainNode = audioContext.createGain();
+track.connect(gainNode).connect(audioContext.destination);
+audioElement.loop = true;
+
+document.getElementById('startAudio').addEventListener('click', () => {
+    audioContext.resume().then(() => {
+        audioElement.play(); // Play audio after interaction
+        document.getElementById('startAudio').style.display = 'none'; // Hide the button after starting
+    });
+});
+
 // Render loop
 function animate() {
     requestAnimationFrame(animate);
-    controls.update(); // Update orbit controls
     renderer.render(scene, camera);
 }
 animate();
