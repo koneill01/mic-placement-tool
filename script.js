@@ -34,9 +34,9 @@ loader.load('assets/drumkit.glb', function(gltf) {
     // Load the microphone model after the drum kit
     loader.load('assets/d112_microphone.glb', function(gltfMic) {
         micModel = gltfMic.scene;
-        micModel.scale.set(0.02, 0.02, 0.02); // Small microphone size
-        micModel.position.set(0, 0, 2); // Adjust the position closer to the kick drum
-        
+        micModel.scale.set(0.03, 0.03, 0.03); // Slightly larger microphone size
+        micModel.position.set(0, -1.2, 4); // Move it in front of the kick drum
+
         // Rotate the microphone to face the drum kit
         micModel.rotation.set(0, Math.PI / 2, 0); // Rotate to face the drum kit
 
