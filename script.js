@@ -40,14 +40,14 @@ loadingManager.onLoad = function () {
 let loader = new THREE.GLTFLoader(loadingManager);
 loader.load('assets/drumkit.glb', function (gltf) {
     let drumKit = gltf.scene;
-    drumKit.scale.set(3, 3, 3); // Scaling drum kit to be larger
+    drumKit.scale.set(4, 4, 4); // Scaling drum kit to be larger
     drumKit.position.set(0, -2.5, 0); // Adjusting position to sit on the ground
     scene.add(drumKit);
 
     // Load Microphone Model
     loader.load('assets/d112_microphone.glb', function (micGltf) {
         let microphone = micGltf.scene;
-        microphone.scale.set(0.1, 0.1, 0.1); // Smaller mic scale
+        microphone.scale.set(0.05, 0.05, 0.05); // Smaller mic scale
         microphone.position.set(0.5, -1.2, 2); // Adjust mic position
         scene.add(microphone);
 
