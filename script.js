@@ -5,8 +5,8 @@ let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById('container').appendChild(renderer.domElement);
 
-// Adjust the camera position to fit the drum kit better
-camera.position.set(0, 5, 30); // Move the camera further back
+// Adjust the camera position
+camera.position.set(0, 5, 20); // Move the camera further back to fit the drum kit
 
 // Add lighting
 const light = new THREE.PointLight(0xffffff, 2, 100);
@@ -22,25 +22,25 @@ let drumKit;
 
 loader.load('assets/drumkit.glb', function(gltf) {
     drumKit = gltf.scene;
-    drumKit.scale.set(2, 2, 2); // Scale down the drum kit further
-    drumKit.position.set(0, -2, 0); // Center it
+    drumKit.scale.set(4, 4, 4); // Restore previous size of drum kit
+    drumKit.position.set(0, -2, 0); // Center the drum kit
     scene.add(drumKit);
 }, undefined, function(error) {
     console.error('An error occurred while loading the model:', error);
 });
 
 // Create a draggable microphone object
-const micGeometry = new THREE.SphereGeometry(0.5, 32, 32); // Scale down the microphone
+const micGeometry = new THREE.SphereGeometry(1, 32, 32); // Restore previous microphone size
 const micMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
 const microphone = new THREE.Mesh(micGeometry, micMaterial);
-microphone.position.set(5, 0, 0);
+microphone.position.set(5, 0, 0); // Position the microphone
 scene.add(microphone);
 
 // Create an invisible plane for mic movement (x-y plane, fixed at z=0)
 const planeGeometry = new THREE.PlaneGeometry(100, 100);
 const planeMaterial = new THREE.MeshBasicMaterial({ visible: false });
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-plane.position.set(0, 0, 0);
+plane.position.set(0, 0, 0); // Plane for movement
 scene.add(plane);
 
 // Raycaster and draggable object (Microphone simulation)
@@ -56,7 +56,7 @@ function onMouseDown(event) {
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
-    
+
     let intersects = raycaster.intersectObjects([microphone]);
 
     if (intersects.length > 0) {
@@ -76,7 +76,7 @@ function onMouseMove(event) {
 
         if (intersects.length > 0) {
             let point = intersects[0].point;
-            draggable.position.set(point.x, point.y, draggable.position.z);
+            draggable.position.set(point.x, point.y, draggable.position.z); // Allow microphone dragging
         }
     }
 }
@@ -87,20 +87,20 @@ function onMouseUp() {
     window.removeEventListener('mouseup', onMouseUp, false);
 }
 
-// Add buttons to move the drum kit to preset positions
+// Rotate the drum kit left and right
 document.getElementById('moveLeft').addEventListener('click', () => {
-    if (drumKit) drumKit.position.x -= 2; // Move left
+    if (drumKit) drumKit.rotation.y += 0.1; // Rotate drum kit to the left
 });
 
 document.getElementById('moveRight').addEventListener('click', () => {
-    if (drumKit) drumKit.position.x += 2; // Move right
+    if (drumKit) drumKit.rotation.y -= 0.1; // Rotate drum kit to the right
 });
 
 document.getElementById('moveCenter').addEventListener('click', () => {
-    if (drumKit) drumKit.position.x = 0; // Center drum kit
+    if (drumKit) drumKit.rotation.y = 0; // Center/Reset the drum kit rotation
 });
 
-// Fix for audio playback (only start after user clicks the button)
+// Fix for audio playback (start/stop audio)
 let audioContext;
 let audioElement;
 let gainNode;
