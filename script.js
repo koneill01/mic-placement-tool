@@ -1,6 +1,10 @@
 // General Three.js Setup
 let scene = new THREE.Scene();
+scene.background = new THREE.Color(0x555555); // Setting the background color
+
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.set(0, 1, 5); // Adjusted camera position to have a better initial zoom
+
 let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById('container').appendChild(renderer.domElement);
@@ -17,14 +21,17 @@ scene.add(ambientLight);
 let loadingManager = new THREE.LoadingManager();
 let progressBar = document.getElementById('loadingBar');
 let progressContainer = document.getElementById('loadingContainer');
+
 loadingManager.onStart = function () {
     progressContainer.style.display = 'block';
 };
+
 loadingManager.onProgress = function (url, loaded, total) {
     let progress = (loaded / total) * 100;
     progressBar.style.width = progress + "%";
     progressBar.innerHTML = Math.floor(progress) + "% Loading";
 };
+
 loadingManager.onLoad = function () {
     progressContainer.style.display = 'none';
 };
@@ -33,19 +40,21 @@ loadingManager.onLoad = function () {
 let loader = new THREE.GLTFLoader(loadingManager);
 loader.load('assets/drumkit.glb', function (gltf) {
     let drumKit = gltf.scene;
-    drumKit.position.set(0, -1, 0);
+    drumKit.scale.set(0.8, 0.8, 0.8); // Scaling down drum kit
+    drumKit.position.set(0, -1, 0); // Position drum kit on the ground
     scene.add(drumKit);
 
     // Load Microphone Model
     loader.load('assets/d112_microphone.glb', function (micGltf) {
         let microphone = micGltf.scene;
-        microphone.position.set(0, 0.1, 1.5); // Adjust Z axis for height
+        microphone.scale.set(0.5, 0.5, 0.5); // Adjust scale of the microphone
+        microphone.position.set(0, 0.5, 2); // Move microphone up on Z-axis
         scene.add(microphone);
 
         // Make mic rotate with drumkit
         function rotateDrumKit(angle) {
             drumKit.rotation.y += angle;
-            microphone.rotation.y += angle;
+            microphone.rotation.y += angle; // Rotate the mic as well with drumkit
         }
 
         // Rotate and zoom controls
