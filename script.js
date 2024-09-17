@@ -18,23 +18,26 @@ scene.add(ambientLight);
 
 // Load GLTFLoader and the drumkit model
 const loader = new THREE.GLTFLoader();
-let drumKit;
+let drumKit, micModel;
 
 loader.load('assets/drumkit.glb', function(gltf) {
     drumKit = gltf.scene;
-    drumKit.scale.set(4, 4, 4); // Restore previous size of drum kit
+    drumKit.scale.set(4, 4, 4); // Scale drum kit
     drumKit.position.set(0, -2, 0); // Center the drum kit
     scene.add(drumKit);
-}, undefined, function(error) {
-    console.error('An error occurred while loading the model:', error);
-});
 
-// Create a draggable microphone object
-const micGeometry = new THREE.SphereGeometry(1, 32, 32); // Restore previous microphone size
-const micMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-const microphone = new THREE.Mesh(micGeometry, micMaterial);
-microphone.position.set(5, 0, 0); // Position the microphone
-scene.add(microphone);
+    // Load the microphone model after the drum kit
+    loader.load('assets/d112_microphone.glb', function(gltfMic) {
+        micModel = gltfMic.scene;
+        micModel.scale.set(0.5, 0.5, 0.5); // Adjust the scale of the microphone
+        micModel.position.set(5, 0, 0); // Position it near the drum kit
+        drumKit.add(micModel); // Attach the microphone to the drum kit to rotate with it
+    }, undefined, function(error) {
+        console.error('Error loading microphone:', error);
+    });
+}, undefined, function(error) {
+    console.error('An error occurred while loading the drum kit:', error);
+});
 
 // Create an invisible plane for mic movement (x-y plane, fixed at z=0)
 const planeGeometry = new THREE.PlaneGeometry(100, 100);
@@ -58,7 +61,8 @@ function onMouseDown(event) {
 
     raycaster.setFromCamera(mouse, camera);
 
-    let intersects = raycaster.intersectObjects([microphone]);
+    // Make the microphone draggable independently
+    let intersects = raycaster.intersectObjects([micModel]);
 
     if (intersects.length > 0) {
         draggable = intersects[0].object;
@@ -90,13 +94,13 @@ function onMouseUp(event) {
     window.removeEventListener('mouseup', onMouseUp);
 }
 
-// Rotate the drum kit left and right
+// Rotate the drum kit (and the attached microphone) left and right
 document.getElementById('moveLeft').addEventListener('click', () => {
-    if (drumKit) drumKit.rotation.y += 0.1; // Rotate drum kit to the left
+    if (drumKit) drumKit.rotation.y += 0.1; // Rotate drum kit (and attached mic) to the left
 });
 
 document.getElementById('moveRight').addEventListener('click', () => {
-    if (drumKit) drumKit.rotation.y -= 0.1; // Rotate drum kit to the right
+    if (drumKit) drumKit.rotation.y -= 0.1; // Rotate drum kit (and attached mic) to the right
 });
 
 document.getElementById('moveCenter').addEventListener('click', () => {
