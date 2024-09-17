@@ -48,7 +48,7 @@ loader.load('assets/drumkit.glb', function (gltf) {
     loader.load('assets/d112_microphone.glb', function (micGltf) {
         let microphone = micGltf.scene;
         microphone.scale.set(0.05, 0.05, 0.05); // Smaller mic scale
-        microphone.position.set(0.5, -1.2, 2); // Adjust mic position
+        microphone.position.set(0.5, -1.2, 8); // Adjust mic position
         scene.add(microphone);
 
         // Make mic rotate with drumkit
