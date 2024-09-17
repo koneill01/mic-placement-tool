@@ -3,7 +3,7 @@ let scene = new THREE.Scene();
 scene.background = new THREE.Color(0x555555); // Setting the background color
 
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(0, 1, 5); // Adjusted camera position to have a better initial zoom
+camera.position.set(0, 1.5, 8); // Adjusted camera position for a more zoomed-out initial view
 
 let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -40,21 +40,21 @@ loadingManager.onLoad = function () {
 let loader = new THREE.GLTFLoader(loadingManager);
 loader.load('assets/drumkit.glb', function (gltf) {
     let drumKit = gltf.scene;
-    drumKit.scale.set(0.8, 0.8, 0.8); // Scaling down drum kit
+    drumKit.scale.set(0.5, 0.5, 0.5); // Scaling drum kit to a manageable size
     drumKit.position.set(0, -1, 0); // Position drum kit on the ground
     scene.add(drumKit);
 
     // Load Microphone Model
     loader.load('assets/d112_microphone.glb', function (micGltf) {
         let microphone = micGltf.scene;
-        microphone.scale.set(0.5, 0.5, 0.5); // Adjust scale of the microphone
-        microphone.position.set(0, 0.5, 2); // Move microphone up on Z-axis
+        microphone.scale.set(0.3, 0.3, 0.3); // Adjusting the mic to fit with the drum kit scale
+        microphone.position.set(0.5, 0, 1.5); // Position the mic in front of the drum kit
         scene.add(microphone);
 
         // Make mic rotate with drumkit
         function rotateDrumKit(angle) {
             drumKit.rotation.y += angle;
-            microphone.rotation.y += angle; // Rotate the mic as well with drumkit
+            microphone.rotation.y += angle; // Rotate the mic as well with the drumkit
         }
 
         // Rotate and zoom controls
