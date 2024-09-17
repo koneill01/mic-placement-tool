@@ -17,6 +17,10 @@ scene.add(light);
 let ambientLight = new THREE.AmbientLight(0x404040, 1.5); // Ambient light for overall lighting
 scene.add(ambientLight);
 
+// Create a group for the drum kit and microphone for common axis rotation
+let rotationGroup = new THREE.Group();
+scene.add(rotationGroup);
+
 // Loading Bar Logic
 let loadingManager = new THREE.LoadingManager();
 let progressBar = document.getElementById('loadingBar');
@@ -42,21 +46,15 @@ loader.load('assets/drumkit.glb', function (gltf) {
     let drumKit = gltf.scene;
     drumKit.scale.set(6, 6, 6); // Scaling drum kit to be larger
     drumKit.position.set(0, -2.5, 0); // Adjusting position to sit on the ground
-    scene.add(drumKit);
+    rotationGroup.add(drumKit); // Adding to the rotation group
 
     // Load Microphone Model
     loader.load('assets/d112_microphone.glb', function (micGltf) {
         let microphone = micGltf.scene;
         microphone.scale.set(0.05, 0.05, 0.05); // Smaller mic scale
         microphone.position.set(0.5, 1, 12); // Adjust mic position
-        // microphone.rotation.set(0, Math.PI, 0); // Rotates the mic 180 degrees on the Y-axis
-        scene.add(microphone);
-
-        // Make mic rotate with drumkit
-        function rotateDrumKit(angle) {
-            drumKit.rotation.y += angle;
-            microphone.rotation.y += angle; // Rotate the mic with the drumkit
-        }
+        microphone.rotation.set(0, Math.PI, 0); // Rotates the mic 180 degrees on the Y-axis
+        rotationGroup.add(microphone); // Adding to the rotation group
 
         // Rotate and zoom controls
         document.getElementById('moveLeft').onmousedown = function () {
@@ -73,6 +71,10 @@ loader.load('assets/drumkit.glb', function (gltf) {
         };
         document.getElementById('moveRight').onmouseup = function () {
             clearInterval(interval);
+        };
+
+        document.getElementById('moveCenter').onclick = function () {
+            rotationGroup.rotation.set(0, 0, 0); // Reset both drum kit and mic rotation
         };
 
         let zoomSpeed = 0.2;
@@ -93,11 +95,11 @@ loader.load('assets/drumkit.glb', function (gltf) {
         };
 
         function rotateLeft() {
-            rotateDrumKit(-0.05);
+            rotationGroup.rotation.y -= 0.05;  // Rotating the entire group to the left
         }
 
         function rotateRight() {
-            rotateDrumKit(0.05);
+            rotationGroup.rotation.y += 0.05;  // Rotating the entire group to the right
         }
 
         function zoomIn() {
