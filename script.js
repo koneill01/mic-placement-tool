@@ -1,5 +1,5 @@
 // Initialize scene, camera, renderer
-let scene = new THREE.Scene(); // Ensure scene is defined at the start
+let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -19,59 +19,67 @@ scene.add(light);
 const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
 
-// Load GLTFLoader and the drumkit model
-const loader = new THREE.GLTFLoader();
+// Loading bar
+const loadingBar = document.createElement('div');
+loadingBar.id = 'loadingBar';
+loadingBar.style.position = 'absolute';
+loadingBar.style.width = '100%';
+loadingBar.style.height = '5px';
+loadingBar.style.backgroundColor = '#fff';
+loadingBar.style.top = '50%';
+loadingBar.style.left = '0';
+loadingBar.style.transform = 'translateY(-50%)';
+document.body.appendChild(loadingBar);
+
 let drumKit, micModel;
 
-loader.load('assets/drumkit.glb', function(gltf) {
+const loader = new THREE.GLTFLoader();
+loader.load('assets/drumkit.glb', function (gltf) {
     drumKit = gltf.scene;
-    drumKit.scale.set(4, 4, 4); // Scale drum kit
-    drumKit.position.set(0, -2, 0); // Center the drum kit
+    drumKit.scale.set(4, 4, 4);
+    drumKit.position.set(0, -2, 0);
     scene.add(drumKit);
 
-    console.log('Drumkit loaded successfully');
-
-    // Load the microphone model after the drum kit
-    loader.load('assets/d112_microphone.glb', function(gltfMic) {
+    // After drum kit loads, load the microphone
+    loader.load('assets/d112_microphone.glb', function (gltfMic) {
         micModel = gltfMic.scene;
-        micModel.scale.set(0.03, 0.03, 0.03); // Slightly larger microphone size
-        micModel.position.set(0, -1.2, 2.5); // Move it closer in front of the kick drum
+        micModel.scale.set(0.02, 0.02, 0.02); // Slightly smaller microphone
+        micModel.position.set(0, -0.9, 1.5); // Closer and higher to the drum kit
 
-        // Rotate the microphone 180 degrees to face the drum kit correctly
-        micModel.rotation.set(0, Math.PI, 0); // Flip microphone
+        micModel.rotation.set(0, Math.PI / 2, 0); // Rotate microphone towards the drum kit
 
-        drumKit.add(micModel); // Attach the microphone to the drum kit so it rotates together
+        drumKit.add(micModel); // Attach microphone to drum kit for rotation
+
+        // Remove loading bar once both models are loaded
+        document.body.removeChild(loadingBar);
         console.log('Microphone loaded successfully');
-    }, undefined, function(error) {
+    }, undefined, function (error) {
         console.error('Error loading microphone:', error);
     });
-}, undefined, function(error) {
+
+}, undefined, function (error) {
     console.error('An error occurred while loading the drum kit:', error);
 });
 
-// Create an invisible plane for mic movement (x-y plane, fixed at z=0)
+// Invisible plane for X-axis mic movement
 const planeGeometry = new THREE.PlaneGeometry(100, 100);
 const planeMaterial = new THREE.MeshBasicMaterial({ visible: false });
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-plane.position.set(0, 0, 0); // Plane for movement
+plane.position.set(0, 0, 0);
 scene.add(plane);
 
-// Raycaster and draggable object (Microphone simulation)
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 let draggable = null;
 
-// Ensure smoother dragging
 window.addEventListener('mousedown', onMouseDown);
 
 function onMouseDown(event) {
-    event.preventDefault(); // Prevent any default action
+    event.preventDefault();
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
-
-    // Make the microphone draggable independently
     let intersects = raycaster.intersectObjects([micModel]);
 
     if (intersects.length > 0) {
@@ -92,7 +100,7 @@ function onMouseMove(event) {
 
         if (intersects.length > 0) {
             let point = intersects[0].point;
-            draggable.position.set(point.x, point.y, draggable.position.z); // Allow microphone dragging
+            draggable.position.set(point.x, draggable.position.y, draggable.position.z); // X-axis dragging only
         }
     }
 }
