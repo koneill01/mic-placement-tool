@@ -29,7 +29,7 @@ loader.load('assets/drumkit.glb', function(gltf) {
     // Load the microphone model after the drum kit
     loader.load('assets/d112_microphone.glb', function(gltfMic) {
         micModel = gltfMic.scene;
-        micModel.scale.set(0.5, 0.5, 0.5); // Adjust the scale of the microphone
+        micModel.scale.set(0.1, 0.1, 0.1); // Scale the microphone down significantly
         micModel.position.set(5, 0, 0); // Position it near the drum kit
         drumKit.add(micModel); // Attach the microphone to the drum kit to rotate with it
     }, undefined, function(error) {
