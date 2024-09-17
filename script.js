@@ -37,8 +37,8 @@ loader.load('assets/drumkit.glb', function(gltf) {
         micModel.scale.set(0.03, 0.03, 0.03); // Slightly larger microphone size
         micModel.position.set(0, -1.2, 2.5); // Move it closer in front of the kick drum
 
-        // Rotate the microphone to face the drum kit
-        micModel.rotation.set(0, Math.PI / 2, 0); // Rotate to face the drum kit
+        // Rotate the microphone 180 degrees to face the drum kit correctly
+        micModel.rotation.set(0, Math.PI, 0); // Flip microphone
 
         drumKit.add(micModel); // Attach the microphone to the drum kit so it rotates together
         console.log('Microphone loaded successfully');
@@ -104,17 +104,32 @@ function onMouseUp(event) {
     window.removeEventListener('mouseup', onMouseUp);
 }
 
-// Rotate the drum kit (and the attached microphone) left and right
-document.getElementById('moveLeft').addEventListener('click', () => {
-    if (drumKit) drumKit.rotation.y += 0.1; // Rotate drum kit (and attached mic) to the left
+// Continuous rotation on button press
+let rotating = false;
+let rotationDirection = 0;
+
+document.getElementById('moveLeft').addEventListener('mousedown', () => {
+    rotating = true;
+    rotationDirection = 1; // Rotate left
 });
 
-document.getElementById('moveRight').addEventListener('click', () => {
-    if (drumKit) drumKit.rotation.y -= 0.1; // Rotate drum kit (and attached mic) to the right
+document.getElementById('moveRight').addEventListener('mousedown', () => {
+    rotating = true;
+    rotationDirection = -1; // Rotate right
 });
+
+document.getElementById('moveLeft').addEventListener('mouseup', stopRotation);
+document.getElementById('moveRight').addEventListener('mouseup', stopRotation);
+document.getElementById('moveLeft').addEventListener('mouseleave', stopRotation);
+document.getElementById('moveRight').addEventListener('mouseleave', stopRotation);
+
+function stopRotation() {
+    rotating = false;
+    rotationDirection = 0;
+}
 
 document.getElementById('moveCenter').addEventListener('click', () => {
-    if (drumKit) drumKit.rotation.y = 0; // Center/Reset the drum kit rotation
+    drumKit.rotation.y = 0; // Center/Reset the drum kit rotation
 });
 
 // Fix for audio playback (start/stop audio)
@@ -148,6 +163,9 @@ document.getElementById('stopAudio').addEventListener('click', () => {
 
 // Render loop
 function animate() {
+    if (rotating) {
+        drumKit.rotation.y += rotationDirection * 0.02; // Continuous rotation based on direction
+    }
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
 }
