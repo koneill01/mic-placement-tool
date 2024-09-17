@@ -48,10 +48,11 @@ let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 let draggable = null;
 
-// Listen for mouse down to drag the microphone
-window.addEventListener('mousedown', onMouseDown, false);
+// Ensure smoother dragging
+window.addEventListener('mousedown', onMouseDown);
 
 function onMouseDown(event) {
+    event.preventDefault(); // Prevent any default action
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
@@ -61,12 +62,13 @@ function onMouseDown(event) {
 
     if (intersects.length > 0) {
         draggable = intersects[0].object;
-        window.addEventListener('mousemove', onMouseMove, false);
-        window.addEventListener('mouseup', onMouseUp, false);
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
     }
 }
 
 function onMouseMove(event) {
+    event.preventDefault();
     if (draggable) {
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -81,10 +83,11 @@ function onMouseMove(event) {
     }
 }
 
-function onMouseUp() {
+function onMouseUp(event) {
+    event.preventDefault();
     draggable = null;
-    window.removeEventListener('mousemove', onMouseMove, false);
-    window.removeEventListener('mouseup', onMouseUp, false);
+    window.removeEventListener('mousemove', onMouseMove);
+    window.removeEventListener('mouseup', onMouseUp);
 }
 
 // Rotate the drum kit left and right

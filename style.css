@@ -3,14 +3,13 @@ body {
     font-family: Arial, sans-serif;
     background-color: #222;
     color: white;
-    text-align: center;
 }
 
 #container {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    background-color: #333; /* To test that the canvas is visible */
+    position: relative;
 }
 
 h1 {
@@ -19,4 +18,41 @@ h1 {
     left: 10px;
     z-index: 100;
     font-size: 1.5em;
+    color: white;
+}
+
+#controls {
+    position: absolute;
+    top: 50px; /* Position the controls at the top */
+    left: 10px;
+    z-index: 100;
+}
+
+button {
+    margin: 5px;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+#startAudio, #stopAudio {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 100;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#startAudio:hover, #stopAudio:hover {
+    background-color: #555;
 }
