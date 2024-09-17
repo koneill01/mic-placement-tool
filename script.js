@@ -40,7 +40,7 @@ loader.load('assets/drumkit.glb', function(gltf) {
         // Rotate the microphone to face the drum kit
         micModel.rotation.set(0, Math.PI / 2, 0); // Rotate to face the drum kit
 
-        scene.add(micModel); // Add microphone to the scene (independently, not attached to drumKit)
+        drumKit.add(micModel); // Add microphone to the drum kit so it rotates with it
         console.log('Microphone loaded successfully');
     }, undefined, function(error) {
         console.error('Error loading microphone:', error);
