@@ -126,6 +126,12 @@ loader.load('assets/drumkit.glb', function (gltf) {
             }
         };
 
+        // Include updateAudioBasedOnMic in the animate loop
+        function animate() {
+            requestAnimationFrame(animate);
+            updateAudioBasedOnMic(); // Update audio properties based on mic position
+            renderer.render(scene, camera);
+        }
         animate();
     });
 });
@@ -182,11 +188,4 @@ function zoomIn() {
 
 function zoomOut() {
     camera.position.z += zoomSpeed;
-}
-
-// Animate Scene with audio update
-function animate() {
-    requestAnimationFrame(animate);
-    updateAudioBasedOnMic(); // Update audio properties based on mic position
-    renderer.render(scene, camera);
 }
