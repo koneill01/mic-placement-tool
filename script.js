@@ -81,7 +81,21 @@ function loadModels() {
 
                 // Adding Drag Controls for the mic group (to ensure the whole thing moves)
                 const dragControls = new THREE.DragControls([microphone], camera, renderer.domElement);
-            
+
+                // Optional: Highlight moused object
+                dragControls.addEventListener('hoveron', function (event) {
+                    if (event.object.material && event.object.material.emissive) {
+                        event.object.material.emissive.set(0xffffff);  // Highlight mic during drag (optional)
+                    }
+                });
+
+                // Optional: Highlight moused object
+                dragControls.addEventListener('hoveroff', function (event) {
+                    if (event.object.material && event.object.material.emissive) {
+                        event.object.material.emissive.set(0x000000);  // Highlight mic during drag (optional)
+                    }
+                });
+
                 // Optional: Highlight dragged object
                 dragControls.addEventListener('dragstart', function (event) {
                     if (event.object.material && event.object.material.emissive) {
@@ -93,12 +107,7 @@ function loadModels() {
                     if (event.object.material && event.object.material.emissive) {
                         event.object.material.emissive.set(0x000000);  // Remove highlight after drag (optional)
                     }
-                });
-            
-                // Constrain dragging to specific axes (e.g., only on x and z)
-                dragControls.addEventListener('drag', function (event) {
-                    event.object.position.y = microphone.position.y; // Lock Y-axis (optional)
-                });
+                });                                 
 
             setupAudio();
             setupDragControls();
@@ -136,7 +145,7 @@ function setupAudio() {
         sound.setDistanceModel('inverse');
         sound.setVolume(5);  // Increased initial volume
         sound.loop = true;
-        sound.position.set(0, -2.5, 0);  // Position at the kick drum
+        sound.position.set(0, 0, 0);  // Position at the kick drum
         scene.add(sound);
 
         console.log("Audio setup complete. Sound position:", sound.position);
@@ -153,6 +162,12 @@ function setupDragControls() {
         console.log("Dragging microphone. New position:", microphone.position);
         updateAudioBasedOnMic();
     });
+    
+    // Constrain dragging to specific axes (e.g., only on x and z)
+        dragControls.addEventListener('drag', function (event) {
+        event.object.position.y = -1.5; // Lock Y-axis to keep the mic on the correct height level
+        console.log("Microphone Moved");
+        });         
 }
 
 function updateAudioBasedOnMic() {
