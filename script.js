@@ -54,7 +54,12 @@ loader.load('assets/drumkit.glb', function (gltf) {
     
         // Create a group to hold the microphone and its parts
         let micGroup = new THREE.Group();
-        micGroup.add(microphone);
+        microphone.traverse(function(child) {
+            if (child.isMesh) {
+                micGroup.add(child); // Add each mesh part of the microphone to the group
+            }
+        });
+        
     
         // Set position and scale for the entire group
         micGroup.scale.set(0.08, 0.08, 0.08); // Adjust mic scale
