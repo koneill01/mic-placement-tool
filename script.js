@@ -89,7 +89,9 @@ loader.load('assets/drumkit.glb', function (gltf) {
         let audioLoader = new THREE.AudioLoader();
         audioLoader.load('assets/drum-loop-kick.mp3', function(buffer) {
             sound.setBuffer(buffer);
-            sound.setRefDistance(2); // Reference distance for spatial audio effect
+            sound.setRefDistance(1); // Smaller ref distance to make the spatial effect more noticeable
+            sound.setRolloffFactor(2); // Increase the rolloff to make the audio change more drastically
+            sound.setDistanceModel('exponential'); // Exponential rolloff
             sound.loop = true;
         });
 
@@ -105,7 +107,7 @@ loader.load('assets/drumkit.glb', function (gltf) {
                 let distance = micPosition.distanceTo(kickDrumPosition);
 
                 // Adjust the sound properties based on distance
-                sound.setRefDistance(Math.max(1, distance));  // Ensure distance is not zero
+                sound.setRefDistance(Math.max(0.5, distance));  // Ensure a minimum refDistance
             }
         }
 
