@@ -51,20 +51,25 @@ loader.load('assets/drumkit.glb', function (gltf) {
     // Load Microphone Model
     loader.load('assets/d112_microphone.glb', function (micGltf) {
         let microphone = micGltf.scene;
+        console.log(microphone); // Debugging: Check if the model is loaded properly
     
         // Create a group to hold the microphone and its parts
         let micGroup = new THREE.Group();
+
         if (microphone) {
+            // Traverse the scene and add each mesh to the group
             microphone.traverse(function(child) {
                 if (child.isMesh) {
+                    if (!child.material) {
+                        // Fallback material in case there's no material
+                        child.material = new THREE.MeshStandardMaterial({ color: 0xaaaaaa });
+                    }
                     micGroup.add(child); // Add each mesh part of the microphone to the group
                 }
             });
         } else {
             console.error("Microphone model not loaded properly.");
         }
-        
-        
     
         // Set position and scale for the entire group
         micGroup.scale.set(0.08, 0.08, 0.08); // Adjust mic scale
@@ -90,7 +95,6 @@ loader.load('assets/drumkit.glb', function (gltf) {
                 event.object.material.emissive.set(0x000000);  // Remove highlight after drag (optional)
             }
         });
-        
     
         // Constrain dragging to specific axes (e.g., only on x and z)
         dragControls.addEventListener('drag', function (event) {
