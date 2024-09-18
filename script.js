@@ -89,11 +89,13 @@ loader.load('assets/drumkit.glb', function (gltf) {
         let audioLoader = new THREE.AudioLoader();
         audioLoader.load('assets/drum-loop-kick.mp3', function(buffer) {
             sound.setBuffer(buffer);
-            sound.setRefDistance(1); // Smaller ref distance to make the spatial effect more noticeable
-            sound.setRolloffFactor(2); // Increase the rolloff to make the audio change more drastically
-            sound.setDistanceModel('exponential'); // Exponential rolloff
+            sound.setRefDistance(0.5);  // Even smaller ref distance for a sharper effect
+            sound.setRolloffFactor(5);  // Increase the rolloff factor for a stronger spatial effect
+            sound.setDistanceModel('exponential');  // Exponential rolloff
+            sound.setVolume(1.5); // Increase the volume (values higher than 1.0 can boost volume)
             sound.loop = true;
         });
+
 
         // Position audio source at the kick drum (replace with actual kick drum coordinates)
         let kickDrumPosition = new THREE.Vector3(0, -2.5, 0); // Adjust based on your model
