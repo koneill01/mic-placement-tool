@@ -68,75 +68,79 @@ loader.load('assets/drumkit.glb', function (gltf) {
     
         // Optional: Highlight dragged object
         dragControls.addEventListener('dragstart', function (event) {
-            event.object.material.emissive.set(0xaaaaaa);  // Highlight during drag (optional)
+            // Ensure the object has material and it supports emissive before setting it
+            if (event.object.material && event.object.material.emissive) {
+                event.object.material.emissive.set(0xaaaaaa);  // Highlight mic during drag (optional)
+            }
         });
-    
+        
         dragControls.addEventListener('dragend', function (event) {
-            event.object.material.emissive.set(0x000000);  // Remove highlight after drag (optional)
+            // Ensure the object has material and it supports emissive before resetting it
+            if (event.object.material && event.object.material.emissive) {
+                event.object.material.emissive.set(0x000000);  // Remove highlight after drag (optional)
+            }
         });
+        
     
         // Constrain dragging to specific axes (e.g., only on x and z)
         dragControls.addEventListener('drag', function (event) {
             event.object.position.y = micGroup.position.y; // Lock Y-axis (optional)
         });
     });
-    
 
+    // Rotate and zoom controls
+    document.getElementById('moveLeft').onmousedown = function () {
+        rotateLeft();
+        interval = setInterval(rotateLeft, 100);
+    };
+    document.getElementById('moveLeft').onmouseup = function () {
+        clearInterval(interval);
+    };
 
-        // Rotate and zoom controls
-        document.getElementById('moveLeft').onmousedown = function () {
-            rotateLeft();
-            interval = setInterval(rotateLeft, 100);
-        };
-        document.getElementById('moveLeft').onmouseup = function () {
-            clearInterval(interval);
-        };
+    document.getElementById('moveRight').onmousedown = function () {
+        rotateRight();
+        interval = setInterval(rotateRight, 100);
+    };
+    document.getElementById('moveRight').onmouseup = function () {
+        clearInterval(interval);
+    };
 
-        document.getElementById('moveRight').onmousedown = function () {
-            rotateRight();
-            interval = setInterval(rotateRight, 100);
-        };
-        document.getElementById('moveRight').onmouseup = function () {
-            clearInterval(interval);
-        };
+    document.getElementById('moveCenter').onclick = function () {
+        rotationGroup.rotation.set(0, 0, 0); // Reset both drum kit and mic rotation
+    };
 
-        document.getElementById('moveCenter').onclick = function () {
-            rotationGroup.rotation.set(0, 0, 0); // Reset both drum kit and mic rotation
-        };
+    let zoomSpeed = 0.2;
+    document.getElementById('zoomIn').onmousedown = function () {
+        zoomIn();
+        interval = setInterval(zoomIn, 100);
+    };
+    document.getElementById('zoomIn').onmouseup = function () {
+        clearInterval(interval);
+    };
 
-        let zoomSpeed = 0.2;
-        document.getElementById('zoomIn').onmousedown = function () {
-            zoomIn();
-            interval = setInterval(zoomIn, 100);
-        };
-        document.getElementById('zoomIn').onmouseup = function () {
-            clearInterval(interval);
-        };
+    document.getElementById('zoomOut').onmousedown = function () {
+        zoomOut();
+        interval = setInterval(zoomOut, 100);
+    };
+    document.getElementById('zoomOut').onmouseup = function () {
+        clearInterval(interval);
+    };
 
-        document.getElementById('zoomOut').onmousedown = function () {
-            zoomOut();
-            interval = setInterval(zoomOut, 100);
-        };
-        document.getElementById('zoomOut').onmouseup = function () {
-            clearInterval(interval);
-        };
+    function rotateLeft() {
+        rotationGroup.rotation.y -= 0.05;  // Rotating the entire group to the left
+    }
 
-        function rotateLeft() {
-            rotationGroup.rotation.y -= 0.05;  // Rotating the entire group to the left
-        }
+    function rotateRight() {
+        rotationGroup.rotation.y += 0.05;  // Rotating the entire group to the right
+    }
 
-        function rotateRight() {
-            rotationGroup.rotation.y += 0.05;  // Rotating the entire group to the right
-        }
+    function zoomIn() {
+        camera.position.z -= zoomSpeed;
+    }
 
-        function zoomIn() {
-            camera.position.z -= zoomSpeed;
-        }
-
-        function zoomOut() {
-            camera.position.z += zoomSpeed;
-        }
-    });
+    function zoomOut() {
+        camera.position.z += zoomSpeed;
+    }
 
     animate();
 });
