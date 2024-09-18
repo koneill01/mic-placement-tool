@@ -55,6 +55,24 @@ loader.load('assets/drumkit.glb', function (gltf) {
         microphone.position.set(-2, -1.5, 5); // Adjust mic position
         microphone.rotation.set(0, 1.57, 0); // Rotates the mic 180 degrees on the Y-axis
         rotationGroup.add(microphone); // Adding to the rotation group
+        
+        // Adding Drag Controls for the Microphone
+        const dragControls = new THREE.DragControls([microphone], camera, renderer.domElement);
+
+        // Optional: Highlight dragged object
+        dragControls.addEventListener('dragstart', function (event) {
+            event.object.material.emissive.set(0xaaaaaa);  // Highlight mic during drag (optional)
+        });
+
+        dragControls.addEventListener('dragend', function (event) {
+            event.object.material.emissive.set(0x000000);  // Remove highlight after drag (optional)
+        });
+
+        // Constrain dragging to specific axes (e.g., only on x and z)
+        dragControls.addEventListener('drag', function (event) {
+            event.object.position.y = microphone.position.y; // Lock Y-axis (optional)
+        });
+
 
         // Rotate and zoom controls
         document.getElementById('moveLeft').onmousedown = function () {
