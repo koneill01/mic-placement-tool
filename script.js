@@ -59,7 +59,7 @@ loader.load('assets/drumkit.glb', function (gltf) {
         if (microphone) {
             // Traverse the scene and add each mesh to the group
             microphone.traverse(function(child) {
-                if (child.isMesh) {
+                if (child && child.isMesh) {
                     if (!child.material) {
                         // Fallback material in case there's no material
                         child.material = new THREE.MeshStandardMaterial({ color: 0xaaaaaa });
