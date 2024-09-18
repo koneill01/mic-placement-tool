@@ -51,46 +51,25 @@ loader.load('assets/drumkit.glb', function (gltf) {
     // Load Microphone Model
     loader.load('assets/d112_microphone.glb', function (micGltf) {
         let microphone = micGltf.scene;
-        console.log(microphone); // Debugging: Check if the model is loaded properly
     
-        // Create a group to hold the microphone and its parts
-        let micGroup = new THREE.Group();
-
-        if (microphone) {
-            // Traverse the scene and add each mesh to the group
-            microphone.traverse(function(child) {
-                if (child && child.isMesh) {
-                    if (!child.material) {
-                        // Fallback material in case there's no material
-                        child.material = new THREE.MeshStandardMaterial({ color: 0xaaaaaa });
-                    }
-                    micGroup.add(child); // Add each mesh part of the microphone to the group
-                }
-            });
-        } else {
-            console.error("Microphone model not loaded properly.");
-        }
+        // Set position and scale for the entire microphone
+        microphone.scale.set(1, 1, 1); // Now that the scale has been handled in Blender
+        microphone.position.set(-2, -1.5, 5); // Adjust position
+        microphone.rotation.set(0, 1.57, 0); // Adjust rotation
     
-        // Set position and scale for the entire group
-        micGroup.scale.set(0.08, 0.08, 0.08); // Adjust mic scale
-        micGroup.position.set(-2, -1.5, 5); // Adjust position
-        micGroup.rotation.set(0, 1.57, 0); // Adjust rotation
-    
-        rotationGroup.add(micGroup); // Adding the group to the rotationGroup
+        rotationGroup.add(microphone); // Adding the microphone to the rotationGroup
     
         // Adding Drag Controls for the mic group (to ensure the whole thing moves)
-        const dragControls = new THREE.DragControls([micGroup], camera, renderer.domElement);
+        const dragControls = new THREE.DragControls([microphone], camera, renderer.domElement);
     
         // Optional: Highlight dragged object
         dragControls.addEventListener('dragstart', function (event) {
-            // Ensure the object has material and it supports emissive before setting it
             if (event.object.material && event.object.material.emissive) {
                 event.object.material.emissive.set(0xaaaaaa);  // Highlight mic during drag (optional)
             }
         });
         
         dragControls.addEventListener('dragend', function (event) {
-            // Ensure the object has material and it supports emissive before resetting it
             if (event.object.material && event.object.material.emissive) {
                 event.object.material.emissive.set(0x000000);  // Remove highlight after drag (optional)
             }
@@ -98,7 +77,7 @@ loader.load('assets/drumkit.glb', function (gltf) {
     
         // Constrain dragging to specific axes (e.g., only on x and z)
         dragControls.addEventListener('drag', function (event) {
-            event.object.position.y = micGroup.position.y; // Lock Y-axis (optional)
+            event.object.position.y = microphone.position.y; // Lock Y-axis (optional)
         });
     });
 
