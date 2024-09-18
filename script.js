@@ -53,7 +53,7 @@ loader.load('assets/drumkit.glb', function (gltf) {
         let microphone = micGltf.scene;
     
         // Set position and scale for the entire microphone
-        microphone.scale.set(.08, .08, .08); // Now that the scale has been handled in Blender
+        microphone.scale.set(0.08, 0.08, 0.08); // Now that the scale has been handled in Blender
         microphone.position.set(-2, -1.5, 5); // Adjust position
         microphone.rotation.set(0, 3 * Math.PI / 2, 0); // Adjust rotation
     
@@ -79,84 +79,114 @@ loader.load('assets/drumkit.glb', function (gltf) {
         dragControls.addEventListener('drag', function (event) {
             event.object.position.y = microphone.position.y; // Lock Y-axis (optional)
         });
+
+        // Add 3D positional audio
+        let listener = new THREE.AudioListener();
+        camera.add(listener);
+
+        // Create a positional audio source
+        let sound = new THREE.PositionalAudio(listener);
+        let audioLoader = new THREE.AudioLoader();
+        audioLoader.load('assets/drum-loop-kick.mp3', function(buffer) {
+            sound.setBuffer(buffer);
+            sound.setRefDistance(2); // Reference distance for spatial audio effect
+            sound.loop = true;
+        });
+
+        // Position audio source at the kick drum (replace with actual kick drum coordinates)
+        let kickDrumPosition = new THREE.Vector3(0, -2.5, 0); // Adjust based on your model
+        sound.position.copy(kickDrumPosition);
+        scene.add(sound);
+
+        // Function to calculate mic distance and update sound
+        function updateAudioBasedOnMic() {
+            if (microphone && sound.isPlaying) {
+                let micPosition = microphone.position;
+                let distance = micPosition.distanceTo(kickDrumPosition);
+
+                // Adjust the sound properties based on distance
+                sound.setRefDistance(Math.max(1, distance));  // Ensure distance is not zero
+            }
+        }
+
+        // Button to start/stop audio
+        document.getElementById('startAudio').onclick = function () {
+            if (!sound.isPlaying) {
+                sound.play();
+                document.getElementById('startAudio').style.display = 'none';
+                document.getElementById('stopAudio').style.display = 'block';
+            }
+        };
+
+        document.getElementById('stopAudio').onclick = function () {
+            if (sound.isPlaying) {
+                sound.stop();
+                document.getElementById('startAudio').style.display = 'block';
+                document.getElementById('stopAudio').style.display = 'none';
+            }
+        };
+
+        animate();
     });
-
-    // Rotate and zoom controls
-    document.getElementById('moveLeft').onmousedown = function () {
-        rotateLeft();
-        interval = setInterval(rotateLeft, 100);
-    };
-    document.getElementById('moveLeft').onmouseup = function () {
-        clearInterval(interval);
-    };
-
-    document.getElementById('moveRight').onmousedown = function () {
-        rotateRight();
-        interval = setInterval(rotateRight, 100);
-    };
-    document.getElementById('moveRight').onmouseup = function () {
-        clearInterval(interval);
-    };
-
-    document.getElementById('moveCenter').onclick = function () {
-        rotationGroup.rotation.set(0, 0, 0); // Reset both drum kit and mic rotation
-    };
-
-    let zoomSpeed = 0.2;
-    document.getElementById('zoomIn').onmousedown = function () {
-        zoomIn();
-        interval = setInterval(zoomIn, 100);
-    };
-    document.getElementById('zoomIn').onmouseup = function () {
-        clearInterval(interval);
-    };
-
-    document.getElementById('zoomOut').onmousedown = function () {
-        zoomOut();
-        interval = setInterval(zoomOut, 100);
-    };
-    document.getElementById('zoomOut').onmouseup = function () {
-        clearInterval(interval);
-    };
-
-    function rotateLeft() {
-        rotationGroup.rotation.y -= 0.05;  // Rotating the entire group to the left
-    }
-
-    function rotateRight() {
-        rotationGroup.rotation.y += 0.05;  // Rotating the entire group to the right
-    }
-
-    function zoomIn() {
-        camera.position.z -= zoomSpeed;
-    }
-
-    function zoomOut() {
-        camera.position.z += zoomSpeed;
-    }
-
-    animate();
 });
 
-// Animate Scene
-function animate() {
-    requestAnimationFrame(animate);
-    renderer.render(scene, camera);
+// Rotate and zoom controls
+document.getElementById('moveLeft').onmousedown = function () {
+    rotateLeft();
+    interval = setInterval(rotateLeft, 100);
+};
+document.getElementById('moveLeft').onmouseup = function () {
+    clearInterval(interval);
+};
+
+document.getElementById('moveRight').onmousedown = function () {
+    rotateRight();
+    interval = setInterval(rotateRight, 100);
+};
+document.getElementById('moveRight').onmouseup = function () {
+    clearInterval(interval);
+};
+
+document.getElementById('moveCenter').onclick = function () {
+    rotationGroup.rotation.set(0, 0, 0); // Reset both drum kit and mic rotation
+};
+
+let zoomSpeed = 0.2;
+document.getElementById('zoomIn').onmousedown = function () {
+    zoomIn();
+    interval = setInterval(zoomIn, 100);
+};
+document.getElementById('zoomIn').onmouseup = function () {
+    clearInterval(interval);
+};
+
+document.getElementById('zoomOut').onmousedown = function () {
+    zoomOut();
+    interval = setInterval(zoomOut, 100);
+};
+document.getElementById('zoomOut').onmouseup = function () {
+    clearInterval(interval);
+};
+
+function rotateLeft() {
+    rotationGroup.rotation.y -= 0.05;  // Rotating the entire group to the left
 }
 
-// Audio logic (unchanged)
-document.getElementById('startAudio').onclick = function () {
-    let audioContext = new AudioContext();
-    let audio = new Audio('assets/drumbeat.mp3');
-    let audioSource = audioContext.createMediaElementSource(audio);
-    audioSource.connect(audioContext.destination);
-    audio.play();
-    document.getElementById('startAudio').style.display = 'none';
-    document.getElementById('stopAudio').style.display = 'block';
-};
+function rotateRight() {
+    rotationGroup.rotation.y += 0.05;  // Rotating the entire group to the right
+}
 
-document.getElementById('stopAudio').onclick = function () {
-    audio.pause();
-    document.getElementById('startAudio').style.display = 'block';
-    document.getElementById('stopAudio').style.display = 'none';
-};
+function zoomIn() {
+    camera.position.z -= zoomSpeed;
+}
+
+function zoomOut() {
+    camera.position.z += zoomSpeed;
+}
+
+// Animate Scene with audio update
+function animate() {
+    requestAnimationFrame(animate);
+    updateAudioBasedOnMic(); // Update audio properties based on mic position
+    renderer.render(scene, camera);
+}
