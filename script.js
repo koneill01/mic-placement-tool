@@ -53,9 +53,9 @@ loader.load('assets/drumkit.glb', function (gltf) {
         let microphone = micGltf.scene;
     
         // Set position and scale for the entire microphone
-        microphone.scale.set(.2, .2, .2); // Now that the scale has been handled in Blender
+        microphone.scale.set(.08, .08, .08); // Now that the scale has been handled in Blender
         microphone.position.set(-2, -1.5, 5); // Adjust position
-        microphone.rotation.set(0, 1.57, 0); // Adjust rotation
+        microphone.rotation.set(0, 3 * Math.PI / 2, 0); // Adjust rotation
     
         rotationGroup.add(microphone); // Adding the microphone to the rotationGroup
     
