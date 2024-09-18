@@ -1,9 +1,10 @@
-// General Three.js Setup
-let scene, camera, renderer, sound, microphone, rotationGroup;
-
+let scene, camera, micCamera, renderer, sound, microphone, rotationGroup, audioContext, soundInitialized = false;
 
 // Setup scene, camera, renderer, etc.
 function init() {
+    // Disable the start audio button until the audio is loaded
+    document.getElementById('startAudio').disabled = true;
+
     // Create scene
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x555555); // Set background color
@@ -16,10 +17,13 @@ function init() {
     let ambientLight = new THREE.AmbientLight(0x404040, 1.5); // Ambient light for overall lighting
     scene.add(ambientLight);
 
-    // Create camera
+    // Create the main camera for viewing
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 5, 10);
     camera.lookAt(0, 0, 0);
+
+    // Create mic camera to follow microphone for sound only
+    micCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
     // Create renderer
     renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -75,43 +79,21 @@ function loadModels() {
             microphone = micGltf.scene;
             microphone.scale.set(0.08, 0.08, 0.08); // Now that the scale has been handled in Blender
             microphone.position.set(4.3, -1.5, 5); // Adjust position
-            microphone.rotation.set(0,  Math.PI / 2, 0); // Adjust rotation
+            microphone.rotation.set(0, Math.PI / 2, 0); // Adjust rotation
             rotationGroup.add(microphone);
             console.log("Microphone added:", microphone.position);
 
-                // Adding Drag Controls for the mic group (to ensure the whole thing moves)
-                const dragControls = new THREE.DragControls([microphone], camera, renderer.domElement);
-
-                // Optional: Highlight moused object
-                dragControls.addEventListener('hoveron', function (event) {
-                    if (event.object.material && event.object.material.emissive) {
-                        event.object.material.emissive.set(0xffffff);  // Highlight mic during drag (optional)
-                    }
-                });
-
-                // Optional: Highlight moused object
-                dragControls.addEventListener('hoveroff', function (event) {
-                    if (event.object.material && event.object.material.emissive) {
-                        event.object.material.emissive.set(0x000000);  // Highlight mic during drag (optional)
-                    }
-                });
-
-                // Optional: Highlight dragged object
-                dragControls.addEventListener('dragstart', function (event) {
-                    if (event.object.material && event.object.material.emissive) {
-                        event.object.material.emissive.set(0xaaaaaa);  // Highlight mic during drag (optional)
-                    }
-                });
-                
-                dragControls.addEventListener('dragend', function (event) {
-                    if (event.object.material && event.object.material.emissive) {
-                        event.object.material.emissive.set(0x000000);  // Remove highlight after drag (optional)
-                    }
-                });                                 
-
-            setupAudio();
+            // Constrain microphone dragging
             setupDragControls();
+
+            // Set the mic camera to follow the microphone's position
+            micCamera.position.copy(microphone.position);
+            micCamera.lookAt(0, 0, 0); // Make it look at the drum kit
+
             fitCameraToScene();  // Fit camera after loading both models
+
+            // Now that models are loaded, we can initialize the audio
+            setupAudio();
         });
     });
 }
@@ -133,22 +115,29 @@ function fitCameraToScene() {
 }
 
 function setupAudio() {
+    // Initialize the AudioContext here but don't start until user interaction
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
     let listener = new THREE.AudioListener();
-    camera.add(listener);
+    micCamera.add(listener);  // Attach listener to the mic camera
 
     sound = new THREE.PositionalAudio(listener);
     let audioLoader = new THREE.AudioLoader();
-    audioLoader.load('assets/drum-loop-kick.mp3', function(buffer) {
+    audioLoader.load('assets/drum-loop-kick.mp3', function (buffer) {
         sound.setBuffer(buffer);
-        sound.setRefDistance(1);
-        sound.setRolloffFactor(2);
-        sound.setDistanceModel('inverse');
-        sound.setVolume(5);  // Increased initial volume
+        sound.setRefDistance(1);  // Adjusted distance for positional audio
+        sound.setRolloffFactor(10);  // More drastic rolloff factor
+        sound.setDistanceModel('exponential');  // Exponential distance model
+        sound.setVolume(5);  // Volume for testing
         sound.loop = true;
-        sound.position.set(0, 0, 0);  // Position at the kick drum
+        sound.position.set(0, -2.5, 0);  // Set sound at the kick drum position
         scene.add(sound);
 
+        soundInitialized = true; // Indicate the sound is fully loaded
         console.log("Audio setup complete. Sound position:", sound.position);
+
+        // Enable the start audio button
+        document.getElementById('startAudio').disabled = false;
     });
 }
 
@@ -162,12 +151,16 @@ function setupDragControls() {
         console.log("Dragging microphone. New position:", microphone.position);
         updateAudioBasedOnMic();
     });
-    
-    // Constrain dragging to specific axes (e.g., only on x and z)
-        dragControls.addEventListener('drag', function (event) {
-        event.object.position.y = -1.5; // Lock Y-axis to keep the mic on the correct height level
-        console.log("Microphone Moved");
-        });         
+
+    // Constrain dragging to specific axes (x-axis movement only)
+    dragControls.addEventListener('drag', function (event) {
+        event.object.position.y = -1.5; // Lock Y-axis
+        event.object.position.z = 5; // Lock Z-axis
+
+        // Update the mic camera's position to match the microphone
+        micCamera.position.copy(microphone.position);
+        micCamera.lookAt(0, 0, 0); // Make sure the mic camera continues to "look" at the drum kit
+    });
 }
 
 function updateAudioBasedOnMic() {
@@ -180,7 +173,8 @@ function updateAudioBasedOnMic() {
 
     let distance = micWorldPosition.distanceTo(kickDrumPosition);
 
-    let volume = 10 / (1 + distance * distance);
+    // Sharper volume change based on distance
+    let volume = 10 / (distance * distance);
     volume = Math.max(0, Math.min(1, volume));
 
     sound.setVolume(volume);
@@ -191,7 +185,7 @@ function updateAudioBasedOnMic() {
 function animate() {
     requestAnimationFrame(animate);
     updateAudioBasedOnMic();
-    renderer.render(scene, camera);
+    renderer.render(scene, camera);  // Render from the main camera's perspective
 }
 
 function onWindowResize() {
@@ -258,15 +252,18 @@ function setupControls() {
 
 // Audio control buttons
 document.getElementById('startAudio').onclick = function () {
-    if (sound) {
-        if (!sound.isPlaying) {
-            sound.play();
-            console.log("Audio started. Is playing:", sound.isPlaying);
-        } else {
-            console.log("Audio is already playing");
-        }
-        document.getElementById('startAudio').style.display = 'none';
-        document.getElementById('stopAudio').style.display = 'block';
+    if (audioContext && soundInitialized) {
+        // Resume AudioContext after user interaction
+        audioContext.resume().then(() => {
+            if (!sound.isPlaying) {
+                sound.play();
+                console.log("Audio started. Is playing:", sound.isPlaying);
+            } else {
+                console.log("Audio is already playing");
+            }
+            document.getElementById('startAudio').style.display = 'none';
+            document.getElementById('stopAudio').style.display = 'block';
+        });
     } else {
         console.log("Sound object not initialized yet");
     }
