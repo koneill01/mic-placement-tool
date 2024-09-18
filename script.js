@@ -54,11 +54,16 @@ loader.load('assets/drumkit.glb', function (gltf) {
     
         // Create a group to hold the microphone and its parts
         let micGroup = new THREE.Group();
-        microphone.traverse(function(child) {
-            if (child.isMesh) {
-                micGroup.add(child); // Add each mesh part of the microphone to the group
-            }
-        });
+        if (microphone) {
+            microphone.traverse(function(child) {
+                if (child.isMesh) {
+                    micGroup.add(child); // Add each mesh part of the microphone to the group
+                }
+            });
+        } else {
+            console.error("Microphone model not loaded properly.");
+        }
+        
         
     
         // Set position and scale for the entire group
